@@ -8,6 +8,19 @@
 import UIKit
 
 final class TrackersViewController: UIViewController {
+    // Список категорий и вложенных в них трекеров
+    private var categories: [TrackerCategory] = []
+
+    // Список видимых категорий при работы с поиском
+    private var visibleCategories: [TrackerCategory] = []
+    
+    // Трекеры, которые были «выполнены» в выбранную дату
+    private var completedTrackers: Set<TrackerRecord> = []
+    
+    // Текущая дата
+    private var currentDate: Date?
+    
+    private var params = GeometricParams(cellCount: 2, leftInset: 16, rightInset: 16, cellSpacing: 9)
     
     private let datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
@@ -30,7 +43,7 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-    
+        
         setupNavigationBar()
         setupViews()
         setupCollectionView()
@@ -49,7 +62,7 @@ final class TrackersViewController: UIViewController {
         // Создание UIBarButtonItem с UIDatePicker в качестве кастомного представления
         let datePickerBarButton = UIBarButtonItem(customView: datePicker)
         navigationItem.rightBarButtonItem = datePickerBarButton
-    
+        
     }
     
     @objc
@@ -71,7 +84,7 @@ final class TrackersViewController: UIViewController {
     }
     
     private func setupViews() {
-        [searchTextField, trackersCollectionView].forEach {view.addViewsWithTAMIC($0)}
+        [searchTextField, trackersCollectionView].forEach {view.addViewsWithNoTAMIC($0)}
         
         NSLayoutConstraint.activate([
             searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -91,6 +104,7 @@ final class TrackersViewController: UIViewController {
         trackersCollectionView.dataSource = self
         
         trackersCollectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
+        trackersCollectionView.register(SupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
     }
 }
 
@@ -102,17 +116,44 @@ extension TrackersViewController: UITextFieldDelegate {
 
 extension TrackersViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        10
+        visibleCategories.count + 2
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCell.reuseIdentifier, for: indexPath) as? TrackerCell else {return UICollectionViewCell()}
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let view = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! SupplementaryView
+        view.titleLabel.text = "Домашний уют"
+        return view
+    }
 }
+
+// MARK: - UICollectionViewDelegateFlowLayout
 
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        CGSize(width: 167, height: 148)
+        
+        return CGSize(width: Int((collectionView.bounds.width - params.paddingWidth)) / params.cellCount, height: 148)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return params.cellSpacing
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        UIEdgeInsets(top: 12, left: params.leftInset, bottom: 0, right: params.leftInset)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        let indexPath = IndexPath(row: 0, section: section)
+        let headerView = self.collectionView(collectionView, viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader, at: indexPath)
+        
+        return headerView.systemLayoutSizeFitting(CGSize(width: collectionView.frame.width,
+                                                         height: UIView.layoutFittingExpandedSize.height),
+                                                  withHorizontalFittingPriority: .required,
+                                                  verticalFittingPriority: .fittingSizeLevel)
     }
 }

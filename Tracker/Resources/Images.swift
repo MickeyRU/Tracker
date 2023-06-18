@@ -13,4 +13,5 @@ struct Images {
     static let statisticsTabBarImage = UIImage(named: "statisticsTabBarImage")
     static let addButtonImage = UIImage(named: "addButtonImage")
     static let addDaysButtonImage = UIImage(named: "addDaysButtonImage")
+    static let addDaysButtonClickedImage = UIImage(named: "addDaysButtonClickedImage")
 }

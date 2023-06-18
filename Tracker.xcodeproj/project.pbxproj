@@ -12,6 +12,9 @@
 		BE1E62B32A3F246D002185B2 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1E62B22A3F246D002185B2 /* MainTabBarController.swift */; };
 		BE1E62B52A3F4BE9002185B2 /* UIView + Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1E62B42A3F4BE9002185B2 /* UIView + Extensions.swift */; };
 		BE1E62BA2A3F4EB2002185B2 /* TrackerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1E62B92A3F4EB2002185B2 /* TrackerCell.swift */; };
+		BE1E62BC2A3F842C002185B2 /* SupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1E62BB2A3F842C002185B2 /* SupplementaryView.swift */; };
+		BE1E62BE2A3F89F8002185B2 /* TrackerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1E62BD2A3F89F8002185B2 /* TrackerModels.swift */; };
+		BE1E62C22A3F8B44002185B2 /* GeometricParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1E62C12A3F8B44002185B2 /* GeometricParams.swift */; };
 		BE638BBF2A3C7D58005900C2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE638BBE2A3C7D58005900C2 /* AppDelegate.swift */; };
 		BE638BC12A3C7D58005900C2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE638BC02A3C7D58005900C2 /* SceneDelegate.swift */; };
 		BE638BC32A3C7D58005900C2 /* TrackersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE638BC22A3C7D58005900C2 /* TrackersViewController.swift */; };
@@ -25,6 +28,9 @@
 		BE1E62B22A3F246D002185B2 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		BE1E62B42A3F4BE9002185B2 /* UIView + Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView + Extensions.swift"; sourceTree = "<group>"; };
 		BE1E62B92A3F4EB2002185B2 /* TrackerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCell.swift; sourceTree = "<group>"; };
+		BE1E62BB2A3F842C002185B2 /* SupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupplementaryView.swift; sourceTree = "<group>"; };
+		BE1E62BD2A3F89F8002185B2 /* TrackerModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerModels.swift; sourceTree = "<group>"; };
+		BE1E62C12A3F8B44002185B2 /* GeometricParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometricParams.swift; sourceTree = "<group>"; };
 		BE638BBB2A3C7D58005900C2 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE638BBE2A3C7D58005900C2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BE638BC02A3C7D58005900C2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -91,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				BE1E62B82A3F4E92002185B2 /* Tracker */,
+				BE1E62C02A3F8B01002185B2 /* Statistic */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -100,8 +107,27 @@
 			children = (
 				BE638BC22A3C7D58005900C2 /* TrackersViewController.swift */,
 				BE1E62B92A3F4EB2002185B2 /* TrackerCell.swift */,
+				BE1E62BB2A3F842C002185B2 /* SupplementaryView.swift */,
 			);
 			name = Tracker;
+			sourceTree = "<group>";
+		};
+		BE1E62BF2A3F8AD8002185B2 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				BE1E62BD2A3F89F8002185B2 /* TrackerModels.swift */,
+				BE1E62C12A3F8B44002185B2 /* GeometricParams.swift */,
+			);
+			name = Models;
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		BE1E62C02A3F8B01002185B2 /* Statistic */ = {
+			isa = PBXGroup;
+			children = (
+				BE1E62B02A3F2434002185B2 /* StatisticsViewController.swift */,
+			);
+			name = Statistic;
 			sourceTree = "<group>";
 		};
 		BE638BB22A3C7D58005900C2 = {
@@ -124,9 +150,9 @@
 			isa = PBXGroup;
 			children = (
 				BE00BEF12A3F1F7F008FC172 /* Application */,
+				BE1E62BF2A3F8AD8002185B2 /* Models */,
 				BE1E62B22A3F246D002185B2 /* MainTabBarController.swift */,
 				BE1E62B72A3F4E87002185B2 /* Screens */,
-				BE1E62B02A3F2434002185B2 /* StatisticsViewController.swift */,
 				BE1E62B62A3F4BF1002185B2 /* Extensions */,
 				BE00BEF42A3F1FE5008FC172 /* Resources */,
 				BE00BEF32A3F1FC9008FC172 /* Storyboards */,
@@ -209,9 +235,12 @@
 				BE1E62B52A3F4BE9002185B2 /* UIView + Extensions.swift in Sources */,
 				BE638BC32A3C7D58005900C2 /* TrackersViewController.swift in Sources */,
 				BE1E62B12A3F2434002185B2 /* StatisticsViewController.swift in Sources */,
+				BE1E62C22A3F8B44002185B2 /* GeometricParams.swift in Sources */,
 				BE1E62B32A3F246D002185B2 /* MainTabBarController.swift in Sources */,
+				BE1E62BC2A3F842C002185B2 /* SupplementaryView.swift in Sources */,
 				BE00BEF62A3F201F008FC172 /* Images.swift in Sources */,
 				BE638BBF2A3C7D58005900C2 /* AppDelegate.swift in Sources */,
+				BE1E62BE2A3F89F8002185B2 /* TrackerModels.swift in Sources */,
 				BE638BC12A3C7D58005900C2 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

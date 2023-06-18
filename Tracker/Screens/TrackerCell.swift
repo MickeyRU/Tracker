@@ -33,6 +33,8 @@ final class TrackerCell: UICollectionViewCell {
     
     var completedDaysLabel: UILabel = {
         let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        label.text = "1 дней"
         return label
     }()
     
@@ -54,17 +56,19 @@ final class TrackerCell: UICollectionViewCell {
     
     @objc
     private func addDaysButtonTapped() {
+        addDaysButton.setImage(Images.addDaysButtonClickedImage, for: .normal)
         // ToDo: - С помощью кнопки можно добавить запись, что этот трекер нужно пометить как выполненный для даты, выбранной в UIDatePicker.
     }
     
     private func setupViews() {
-        [colorBackGroundView, emojiImage, trackerTextLabel].forEach {contentView.addViewsWithTAMIC($0)}
+        [colorBackGroundView, emojiImage, trackerTextLabel, addDaysButton, completedDaysLabel].forEach {contentView.addViewsWithNoTAMIC($0)}
         
         NSLayoutConstraint.activate([
             colorBackGroundView.topAnchor.constraint(equalTo: contentView.topAnchor),
             colorBackGroundView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             colorBackGroundView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             colorBackGroundView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.6),
+            
             emojiImage.widthAnchor.constraint(equalToConstant: 24),
             emojiImage.heightAnchor.constraint(equalTo: emojiImage.widthAnchor, multiplier: 1),
             emojiImage.topAnchor.constraint(equalTo: colorBackGroundView.topAnchor, constant: 12),
@@ -73,8 +77,15 @@ final class TrackerCell: UICollectionViewCell {
             trackerTextLabel.leadingAnchor.constraint(equalTo: colorBackGroundView.leadingAnchor, constant: 12),
             trackerTextLabel.bottomAnchor.constraint(equalTo: colorBackGroundView.bottomAnchor, constant: -12),
             trackerTextLabel.trailingAnchor.constraint(equalTo: colorBackGroundView.trailingAnchor, constant: -12),
-
-
+            
+            addDaysButton.widthAnchor.constraint(equalToConstant: 34),
+            addDaysButton.heightAnchor.constraint(equalToConstant: 34),
+            addDaysButton.topAnchor.constraint(equalTo: colorBackGroundView.bottomAnchor, constant: 8),
+            addDaysButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            
+            completedDaysLabel.topAnchor.constraint(equalTo: colorBackGroundView.bottomAnchor, constant: 16),
+            completedDaysLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
+            completedDaysLabel.trailingAnchor.constraint(equalTo: addDaysButton.leadingAnchor, constant: -8)
         ])
     }
 }
