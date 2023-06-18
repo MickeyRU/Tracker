@@ -14,7 +14,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let scene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: scene)
-        window.rootViewController = TrackersViewController()
+        let mainTabBarController = MainTabBarController()
+        window.rootViewController = mainTabBarController
         self.window = window
         window.makeKeyAndVisible()
     }
