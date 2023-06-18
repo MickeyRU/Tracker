@@ -68,7 +68,9 @@ final class TrackersViewController: UIViewController {
     @objc
     private func addButtonTapped() {
         // Действия при нажатии кнопки "+"
-        // ToDo: - При нажатии на неё отображается экран выбора типа трекера («Привычка» или «Нерегулярное событие») — см. пункт 7 ниже
+        let destinationViewController = CreateNewTracker()
+        destinationViewController.modalPresentationStyle = .formSheet
+        present(destinationViewController, animated: true)
     }
     
     @objc
