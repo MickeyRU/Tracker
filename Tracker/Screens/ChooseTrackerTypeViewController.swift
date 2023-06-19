@@ -1,5 +1,5 @@
 //
-//  CreateNewTracker.swift
+//  ChooseTrackerTypeViewController.swift
 //  Tracker
 //
 //  Created by Павел Афанасьев on 18.06.2023.
@@ -7,7 +7,8 @@
 
 import UIKit
 
-final class CreateNewTracker: UIViewController {
+final class ChooseTrackerTypeViewController: UIViewController {
+    
     private let pageTitle: UILabel = {
         let label = UILabel()
         label.text = "Создание трекера"
@@ -23,6 +24,7 @@ final class CreateNewTracker: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = .white
         button.layer.cornerRadius = 16
+        button.addTarget(self, action: #selector(habitButtonDidTapped), for: .touchUpInside)
         return button
     }()
     
@@ -33,6 +35,7 @@ final class CreateNewTracker: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = .white
         button.layer.cornerRadius = 16
+        button.addTarget(self, action: #selector(irregularEvenButtonDidTapped), for: .touchUpInside)
         return button
     }()
     
@@ -43,8 +46,28 @@ final class CreateNewTracker: UIViewController {
         setupViews()
     }
     
+    @objc
+    private func habitButtonDidTapped() {
+        // ToDo: Действие при нажатии на кнопку "Привычка"
+        let createTrackerViewController = CreateTrackerViewController()
+        createTrackerViewController.modalPresentationStyle = .formSheet
+        let optionsArray = ["Категория", "Расписание"]
+        createTrackerViewController.configTitleAndOptions("Новая привычка", optionsArray)
+        present(createTrackerViewController, animated: true)
+    }
+    
+    @objc
+    private func irregularEvenButtonDidTapped() {
+        // ToDo: Действие при нажатии на кнопку "Нерегулярное событие"
+        let createTrackerViewController = CreateTrackerViewController()
+        createTrackerViewController.modalPresentationStyle = .formSheet
+        let optionsArray = ["Категория"]
+        createTrackerViewController.configTitleAndOptions("Новое нерегулярное событие", optionsArray)
+        present(createTrackerViewController, animated: true)
+    }
+    
     private func setupViews() {
-        [pageTitle, habitButton, irregularEventButton].forEach {view.addViewsWithNoTAMIC($0)}
+        [pageTitle, habitButton, irregularEventButton].forEach { view.addViewsWithNoTAMIC($0) }
         
         NSLayoutConstraint.activate([
             pageTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor),

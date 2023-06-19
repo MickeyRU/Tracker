@@ -68,7 +68,7 @@ final class TrackersViewController: UIViewController {
     @objc
     private func addButtonTapped() {
         // Действия при нажатии кнопки "+"
-        let destinationViewController = CreateNewTracker()
+        let destinationViewController = ChooseTrackerTypeViewController()
         destinationViewController.modalPresentationStyle = .formSheet
         present(destinationViewController, animated: true)
     }
