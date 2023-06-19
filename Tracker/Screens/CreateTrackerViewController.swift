@@ -37,7 +37,32 @@ final class CreateTrackerViewController: UIViewController {
         return tableView
     }()
     
+    private let cancelButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Отменить", for: .normal)
+        button.setTitleColor(UIColor(red: 0.96, green: 0.42, blue: 0.42, alpha: 1.0), for: .normal)
+        button.layer.cornerRadius = 16
+        button.layer.borderWidth = 1
+        button.layer.borderColor = CGColor(red: 0.96, green: 0.42, blue: 0.42, alpha: 1.0)
+        button.backgroundColor = .white
+        button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
+        return button
+    }()
     
+    private let createButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Создать", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 16
+        button.backgroundColor = .lightGray
+        button.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    private let buttonStackView: UIStackView = {
+        let stackView = UIStackView()
+        return stackView
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,6 +70,7 @@ final class CreateTrackerViewController: UIViewController {
         view.backgroundColor = .white
         setupViews()
         setupTableView()
+        setupButtonStackView()
     }
     
     func configTitleAndOptions(_ title: String, _ options: [String]) {
@@ -52,8 +78,18 @@ final class CreateTrackerViewController: UIViewController {
         self.trackerOptions = options
     }
     
+    @objc
+    private func cancelButtonTapped() {
+        dismiss(animated: true)
+    }
+    
+    @objc
+    private func createButtonTapped() {
+        // ToDo: - При нажатии на «Сохранить» новый трекер добавляется в общий список и отображается на главном экране
+    }
+    
     private func setupViews() {
-        [pageTitle, trackerNameTextField, trackerOptionsTableView].forEach { view.addViewsWithNoTAMIC($0) }
+        [pageTitle, trackerNameTextField, trackerOptionsTableView, buttonStackView].forEach { view.addViewsWithNoTAMIC($0) }
         
         NSLayoutConstraint.activate([
             pageTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -67,7 +103,12 @@ final class CreateTrackerViewController: UIViewController {
             trackerOptionsTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
             trackerOptionsTableView.leadingAnchor.constraint(equalTo: trackerNameTextField.leadingAnchor),
             trackerOptionsTableView.trailingAnchor.constraint(equalTo: trackerNameTextField.trailingAnchor),
-            trackerOptionsTableView.heightAnchor.constraint(equalToConstant: CGFloat(trackerOptions.count * 75))
+            trackerOptionsTableView.heightAnchor.constraint(equalToConstant: CGFloat(trackerOptions.count * 75)),
+            
+            buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            buttonStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            buttonStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            buttonStackView.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
     
@@ -76,6 +117,13 @@ final class CreateTrackerViewController: UIViewController {
         trackerOptionsTableView.delegate = self
         trackerOptionsTableView.register(TrackerOptionsCell.self, forCellReuseIdentifier: TrackerOptionsCell.reuseIdentifier)
         trackerOptionsTableView.layer.cornerRadius = 16
+    }
+    
+    private func setupButtonStackView() {
+        [cancelButton, createButton].forEach { buttonStackView.addArrangedSubview($0) }
+        buttonStackView.spacing = 8
+        buttonStackView.axis = .horizontal
+        buttonStackView.distribution = .fillEqually
     }
 }
 
