@@ -9,8 +9,8 @@ import UIKit
 
 final class TrackersViewController: UIViewController {
     // Список категорий и вложенных в них трекеров
-    private var categories: [TrackerCategory] = []
-
+    private var categories: [TrackerCategory] = [TrackerCategory(name: "Домашний Уют", trackers: [])]
+    
     // Список видимых категорий при работы с поиском
     private var visibleCategories: [TrackerCategory] = []
     
@@ -47,6 +47,29 @@ final class TrackersViewController: UIViewController {
         setupNavigationBar()
         setupViews()
         setupCollectionView()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleNewTrackerNotification(_:)), name: Notification.Name("NewTrackerNotification"), object: nil)
+    }
+    
+    @objc
+    private func handleNewTrackerNotification(_ notification: Notification) {
+        if let userInfo = notification.userInfo {
+            if let category = userInfo["Category"] as? TrackerCategory,
+               let tracker = userInfo["NewTracker"] as? Tracker {
+                if let index = self.categories.firstIndex(where: {$0.name == category.name}) {
+                    let oldCategory = self.categories.remove(at: index)
+                    let updatedCategory = TrackerCategory(name: category.name, trackers: oldCategory.trackers + [tracker])
+                    self.categories.insert(updatedCategory, at: index)
+                } else {
+                    //            ToDo: - если новая категория прилетает, доработать функционал:
+                    //            let newCategory = TrackerCategory(name: categoryName, trackers: [tracker])
+                    //            self.categories.append(newCategory)
+                }
+                DispatchQueue.main.async {
+                    self.trackersCollectionView.reloadData()
+                }
+            }
+        }
     }
     
     private func setupNavigationBar() {
@@ -118,11 +141,23 @@ extension TrackersViewController: UITextFieldDelegate {
 
 extension TrackersViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        visibleCategories.count + 2
+        return self.categories[section].trackers.count
+        //        visibleCategories.count
+        //    ToDo: - Согласно ТЗ чтобы при поиске и/или изменении дня недели отображался другой набор трекеров, рекомендуем параллельно со свойством categories добавить свойство visibleCategories: [TrackerCategory]. Например, это пригодится в случае, когда пользователь вбивает текст в UISearchTextField — содержимое массива categories будет отфильтровываться. При реализации UICollectionViewDataSource нужно использовать visibleCategories. Допускается использовать collectionView.reloadData() после обновления значения visibleCategories (при желании можно использовать collectionView.performBatchUpdates)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCell.reuseIdentifier, for: indexPath) as? TrackerCell else {return UICollectionViewCell()}
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCell.reuseIdentifier, for: indexPath) as? TrackerCell else { return UICollectionViewCell() }
+        
+        if let category = categories[safe: indexPath.section], category.trackers.indices.contains(indexPath.row) {
+            let tracker = category.trackers[indexPath.row]
+            // Используйте tracker для настройки ячейки
+            cell.trackerTextLabel.text = tracker.name
+        } else {
+            print("Пусто")
+            // Массив trackers пуст или индекс выходит за пределы массива
+            // Выполните альтернативное действие или установите значение по умолчанию
+        }
         return cell
     }
     
@@ -159,3 +194,10 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                                                   verticalFittingPriority: .fittingSizeLevel)
     }
 }
+
+extension Collection {
+    subscript(safe index: Index) -> Element? {
+        return indices.contains(index) ? self[index] : nil
+    }
+}
+

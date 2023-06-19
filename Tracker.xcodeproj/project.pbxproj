@@ -23,6 +23,7 @@
 		BE638BCB2A3C7D5F005900C2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE638BC92A3C7D5F005900C2 /* LaunchScreen.storyboard */; };
 		BEEE7C4E2A40412700315F2D /* CreateTrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEE7C4D2A40412700315F2D /* CreateTrackerViewController.swift */; };
 		BEEE7C502A40580400315F2D /* TrackerOptionsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEE7C4F2A40580400315F2D /* TrackerOptionsCell.swift */; };
+		BEEE7C522A40C98400315F2D /* UIColor + Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEE7C512A40C98400315F2D /* UIColor + Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 		BE638BCC2A3C7D5F005900C2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BEEE7C4D2A40412700315F2D /* CreateTrackerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTrackerViewController.swift; sourceTree = "<group>"; };
 		BEEE7C4F2A40580400315F2D /* TrackerOptionsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerOptionsCell.swift; sourceTree = "<group>"; };
+		BEEE7C512A40C98400315F2D /* UIColor + Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor + Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				BE1E62B42A3F4BE9002185B2 /* UIView + Extensions.swift */,
+				BEEE7C512A40C98400315F2D /* UIColor + Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -246,6 +249,7 @@
 				BE1E62B12A3F2434002185B2 /* StatisticsViewController.swift in Sources */,
 				BE1E62C22A3F8B44002185B2 /* GeometricParams.swift in Sources */,
 				BE1E62B32A3F246D002185B2 /* MainTabBarController.swift in Sources */,
+				BEEE7C522A40C98400315F2D /* UIColor + Extensions.swift in Sources */,
 				BE1E62BC2A3F842C002185B2 /* SupplementaryView.swift in Sources */,
 				BE00BEF62A3F201F008FC172 /* Images.swift in Sources */,
 				BE638BBF2A3C7D58005900C2 /* AppDelegate.swift in Sources */,

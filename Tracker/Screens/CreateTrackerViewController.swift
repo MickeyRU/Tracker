@@ -8,8 +8,10 @@
 import UIKit
 
 final class CreateTrackerViewController: UIViewController {
+        
+    private var trackerOptions: [String] = [] // Опции доступные для выбранного типа трекера
     
-    private var trackerOptions: [String] = []
+    private var weekSchedule = WeekSchedule() // Экземпляр модели дни недели для хранения расписания в случае если трекер - привычка
     
     private var pageTitle: UILabel = {
         let label = UILabel()
@@ -85,7 +87,24 @@ final class CreateTrackerViewController: UIViewController {
     
     @objc
     private func createButtonTapped() {
-        // ToDo: - При нажатии на «Сохранить» новый трекер добавляется в общий список и отображается на главном экране
+        // При нажатии на кнопку у нас создается новая категория // ToDo: доработать функционал позже, пока статичная категория
+        let category = TrackerCategory(name: "Домашний Уют", trackers: [])
+        
+        let trackerName = "Тестовый трекер"
+        // ToDo: - Добавить функционал нейминга нового трекера в соотвествии с тем, что ввел пользователь в текстфилд.
+        
+        let newTracker = Tracker(name: trackerName,
+                                 color: UIColor.randomColor, // ToDo: - Пока рандом - дальше переделать на выбранное пользователем.
+                                 emoji: "🔥", // ToDo: - Пока сам указал - дальше переделать на выбранное пользователем.
+                                 schedule: weekSchedule)
+        
+        let userInfo: [String: Any] = [
+            "Category": category,
+            "NewTracker": newTracker,
+        ]
+        
+        NotificationCenter.default.post(name: NSNotification.Name("NewTrackerNotification"), object: nil, userInfo: userInfo)
+        self.presentingViewController?.presentingViewController?.dismiss(animated: true)
     }
     
     private func setupViews() {
