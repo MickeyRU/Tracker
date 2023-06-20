@@ -57,7 +57,15 @@ final class TrackersViewController: UIViewController {
                let tracker = userInfo["NewTracker"] as? Tracker {
                 if let index = self.categories.firstIndex(where: {$0.name == category.name}) {
                     let oldCategory = self.categories.remove(at: index)
-                    let updatedCategory = TrackerCategory(name: category.name, trackers: oldCategory.trackers + [tracker])
+                    let oldTrackersArray = oldCategory.trackers
+
+                    // Создаем новый массив трекеров, добавляя новый трекер
+                    var updatedTrackersArray = oldTrackersArray
+                    updatedTrackersArray.append(tracker)
+
+                    // Создаем новый экземпляр TrackerCategory с обновленным списком трекеров
+                    let updatedCategory = TrackerCategory(name: oldCategory.name, trackers: updatedTrackersArray)
+
                     self.categories.insert(updatedCategory, at: index)
                 } else {
                     //            ToDo: - если новая категория прилетает, доработать функционал:
@@ -193,6 +201,8 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                                                   verticalFittingPriority: .fittingSizeLevel)
     }
 }
+ 
+// MARK: - DaysCountProtocol
 
 extension TrackersViewController: DaysCountProtocol {
     func changeDaysCount(at cell: TrackerCell, isDayCountIncreased: Bool) {
