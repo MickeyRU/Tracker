@@ -7,8 +7,7 @@
 
 import UIKit
 
-final class ChooseTrackerTypeViewController: UIViewController {
-    
+final class TrackerTypeViewController: UIViewController {
     private let pageTitle: UILabel = {
         let label = UILabel()
         label.text = "Создание трекера"
@@ -46,24 +45,22 @@ final class ChooseTrackerTypeViewController: UIViewController {
         setupViews()
     }
     
+    private func presentTrackerDetailsViewController(trackerName: String, category: [String]) {
+        let trackerDetailsViewController = TrackerDetailsViewController()
+        trackerDetailsViewController.modalPresentationStyle = .formSheet
+        let optionsArray = category
+        trackerDetailsViewController.configTitleAndOptions(trackerName, optionsArray)
+        present(trackerDetailsViewController, animated: true)
+    }
+
     @objc
     private func habitButtonDidTapped() {
-        // ToDo: Действие при нажатии на кнопку "Привычка"
-        let createTrackerViewController = CreateTrackerViewController()
-        createTrackerViewController.modalPresentationStyle = .formSheet
-        let optionsArray = ["Категория", "Расписание"]
-        createTrackerViewController.configTitleAndOptions("Новая привычка", optionsArray)
-        present(createTrackerViewController, animated: true)
+        presentTrackerDetailsViewController(trackerName: "Новая привычка", category: ["Категория", "Расписание"])
     }
     
     @objc
     private func irregularEvenButtonDidTapped() {
-        // ToDo: Действие при нажатии на кнопку "Нерегулярное событие"
-        let createTrackerViewController = CreateTrackerViewController()
-        createTrackerViewController.modalPresentationStyle = .formSheet
-        let optionsArray = ["Категория"]
-        createTrackerViewController.configTitleAndOptions("Новое нерегулярное событие", optionsArray)
-        present(createTrackerViewController, animated: true)
+        presentTrackerDetailsViewController(trackerName: "Новое нерегулярное событие", category: ["Категория"])
     }
     
     private func setupViews() {

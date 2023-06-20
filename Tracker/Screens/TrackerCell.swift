@@ -61,7 +61,7 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func setupViews() {
-        [colorBackGroundView, emojiImage, trackerTextLabel, addDaysButton, completedDaysLabel].forEach {contentView.addViewsWithNoTAMIC($0)}
+        [colorBackGroundView, emojiImage, trackerTextLabel, addDaysButton, completedDaysLabel].forEach { contentView.addViewsWithNoTAMIC($0) }
         
         NSLayoutConstraint.activate([
             colorBackGroundView.topAnchor.constraint(equalTo: contentView.topAnchor),

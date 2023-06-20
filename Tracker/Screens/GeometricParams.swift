@@ -5,7 +5,7 @@
 //  Created by Павел Афанасьев on 18.06.2023.
 //
 
-import UIKit
+import Foundation
 
 struct GeometricParams {
     let cellCount: Int

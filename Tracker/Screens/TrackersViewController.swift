@@ -17,9 +17,7 @@ final class TrackersViewController: UIViewController {
     // Трекеры, которые были «выполнены» в выбранную дату
     private var completedTrackers: Set<TrackerRecord> = []
     
-    // Текущая дата
-    private var currentDate: Date?
-    
+    // Параметры для настройки размеров коллекции
     private var params = GeometricParams(cellCount: 2, leftInset: 16, rightInset: 16, cellSpacing: 9)
     
     private let datePicker: UIDatePicker = {
@@ -29,6 +27,7 @@ final class TrackersViewController: UIViewController {
         return datePicker
     }()
     
+    // ToDo: - Отображение кнопки "Очистить", которое есть в макетах не настроено. Доделать позже, сейчас просто стандартный крестик
     private let searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
         textField.placeholder = "Поиск"
@@ -45,8 +44,8 @@ final class TrackersViewController: UIViewController {
         view.backgroundColor = .white
         
         setupNavigationBar()
-        setupViews()
         setupCollectionView()
+        setupViews()
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleNewTrackerNotification(_:)), name: Notification.Name("NewTrackerNotification"), object: nil)
     }
@@ -91,7 +90,7 @@ final class TrackersViewController: UIViewController {
     @objc
     private func addButtonTapped() {
         // Действия при нажатии кнопки "+"
-        let destinationViewController = ChooseTrackerTypeViewController()
+        let destinationViewController = TrackerTypeViewController()
         destinationViewController.modalPresentationStyle = .formSheet
         present(destinationViewController, animated: true)
     }
@@ -151,11 +150,10 @@ extension TrackersViewController: UICollectionViewDataSource {
         
         if let category = categories[safe: indexPath.section], category.trackers.indices.contains(indexPath.row) {
             let tracker = category.trackers[indexPath.row]
-            // Используйте tracker для настройки ячейки
             cell.trackerTextLabel.text = tracker.name
         } else {
             print("Пусто")
-            // Массив trackers пуст или индекс выходит за пределы массива
+            // ToDo: - Массив trackers пуст или индекс выходит за пределы массива
             // Выполните альтернативное действие или установите значение по умолчанию
         }
         return cell
@@ -172,7 +170,6 @@ extension TrackersViewController: UICollectionViewDataSource {
 
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
         return CGSize(width: Int((collectionView.bounds.width - params.paddingWidth)) / params.cellCount, height: 148)
     }
     
@@ -194,10 +191,3 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                                                   verticalFittingPriority: .fittingSizeLevel)
     }
 }
-
-extension Collection {
-    subscript(safe index: Index) -> Element? {
-        return indices.contains(index) ? self[index] : nil
-    }
-}
-

@@ -14,5 +14,5 @@ struct Images {
     static let addButtonImage = UIImage(named: "addButtonImage")
     static let addDaysButtonImage = UIImage(named: "addDaysButtonImage")
     static let addDaysButtonClickedImage = UIImage(named: "addDaysButtonClickedImage")
-    static let choseButtonImage = UIImage(named: "choseButtonImage")
+    static let arrowImage = UIImage(named: "arrowImage")
 }
