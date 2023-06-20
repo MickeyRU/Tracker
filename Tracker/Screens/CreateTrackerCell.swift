@@ -8,18 +8,18 @@
 import UIKit
 
 protocol SwitcherProtocolDelegate: AnyObject {
-    func receiveValue(at cell: TrackerDetailsCell, isSelected: Bool)
+    func receiveSwitcherValue(at cell: CreateTrackerCell, isSelected: Bool)
 }
 
-enum CellElement{
+enum CellElement {
     case arrowImageView
     case daySelectionSwitch
 }
 
-final class TrackerDetailsCell: UITableViewCell {
+final class CreateTrackerCell: UITableViewCell {
     weak var delegate: SwitcherProtocolDelegate?
     
-    static let reuseIdentifier = "TrackerDetailsCell"
+    static let reuseIdentifier = "CreateTrackerCell:"
     
     private var isSwitchSelected = false
     
@@ -45,6 +45,7 @@ final class TrackerDetailsCell: UITableViewCell {
     func configurate(nameLabel: String, element: CellElement) {
         self.cellNameLabel.text = nameLabel
         
+        // В зависимости от входного элемента настраиваем нужный UI элемент для экрана.
         switch element {
         case .arrowImageView:
             arrowImageView = UIImageView(image: Images.arrowImage)
@@ -75,16 +76,15 @@ final class TrackerDetailsCell: UITableViewCell {
     @objc
     private func switchValueDidChanged() {
         isSwitchSelected = !isSwitchSelected
-        delegate?.receiveValue(at: self, isSelected: isSwitchSelected)
-        }
-        
-        private func setupViews() {
-            contentView.addViewsWithNoTAMIC(cellNameLabel)
-            
-            NSLayoutConstraint.activate([
-                
-                cellNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-                cellNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            ])
-        }
+        delegate?.receiveSwitcherValue(at: self, isSelected: isSwitchSelected)
     }
+    
+    private func setupViews() {
+        contentView.addViewsWithNoTAMIC(cellNameLabel)
+        
+        NSLayoutConstraint.activate([
+            cellNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            cellNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+        ])
+    }
+}

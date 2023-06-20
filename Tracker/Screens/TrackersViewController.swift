@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  TrackersViewController.swift
 //  Tracker
 //
 //  Created by Павел Афанасьев on 16.06.2023.
@@ -90,7 +90,7 @@ final class TrackersViewController: UIViewController {
     @objc
     private func addButtonTapped() {
         // Действия при нажатии кнопки "+"
-        let destinationViewController = TrackerTypeViewController()
+        let destinationViewController = ChooseTrackerTypeViewController()
         destinationViewController.modalPresentationStyle = .formSheet
         present(destinationViewController, animated: true)
     }
@@ -147,14 +147,16 @@ extension TrackersViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCell.reuseIdentifier, for: indexPath) as? TrackerCell else { return UICollectionViewCell() }
+        cell.delegate = self
         
         if let category = categories[safe: indexPath.section], category.trackers.indices.contains(indexPath.row) {
             let tracker = category.trackers[indexPath.row]
             cell.trackerTextLabel.text = tracker.name
+            cell.emoji.text = tracker.emoji
         } else {
             print("Пусто")
             // ToDo: - Массив trackers пуст или индекс выходит за пределы массива
-            // Выполните альтернативное действие или установите значение по умолчанию
+            // Выполнить альтернативное действие или установите значение по умолчанию
         }
         return cell
     }
@@ -189,5 +191,33 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                                                          height: UIView.layoutFittingExpandedSize.height),
                                                   withHorizontalFittingPriority: .required,
                                                   verticalFittingPriority: .fittingSizeLevel)
+    }
+}
+
+extension TrackersViewController: DaysCountProtocol {
+    func changeDaysCount(at cell: TrackerCell, isDayCountIncreased: Bool) {
+        guard let currentDaysCount = cell.completedDaysLabel.text else { return }
+        let currentDaysDigitString = currentDaysCount.filter {$0.isNumber}
+        guard let number = Int(currentDaysDigitString) else { return }
+        var changedNumber = number
+        if isDayCountIncreased {
+            changedNumber += 1
+        } else {
+            changedNumber -= 1
+        }
+        let formattedLabel = formatDayLabel(for: changedNumber)
+        cell.completedDaysLabel.text = formattedLabel
+    }
+    
+    // Для склонения слова "день" в зависимости от числа "1" существует правило: если число заканчивается на "1" и не является числом "11", то используется форма "день"; в остальных случаях используется форма "дня".
+    private func formatDayLabel(for number: Int) -> String {
+        let lastDigit = number % 10
+        let lastTwoDigits = number % 100
+        
+        if lastDigit == 1 && lastTwoDigits != 11 {
+            return "\(number) день"
+        } else {
+            return "\(number) дней"
+        }
     }
 }

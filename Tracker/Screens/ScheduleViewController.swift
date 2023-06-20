@@ -76,7 +76,7 @@ final class ScheduleViewController: UIViewController {
     private func setupTableView() {
         daysOfWeekTableView.dataSource = self
         daysOfWeekTableView.delegate = self
-        daysOfWeekTableView.register(TrackerDetailsCell.self, forCellReuseIdentifier: TrackerDetailsCell.reuseIdentifier)
+        daysOfWeekTableView.register(CreateTrackerCell.self, forCellReuseIdentifier: CreateTrackerCell.reuseIdentifier)
         daysOfWeekTableView.layer.cornerRadius = 16
     }
 }
@@ -89,7 +89,7 @@ extension ScheduleViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: TrackerDetailsCell.reuseIdentifier, for: indexPath) as? TrackerDetailsCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: CreateTrackerCell.reuseIdentifier, for: indexPath) as? CreateTrackerCell else {
             return UITableViewCell()
         }
         cell.delegate = self
@@ -110,21 +110,10 @@ extension ScheduleViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         SeparatorLineHelper.configSeparatingLine(tableView: tableView, cell: cell, indexPath: indexPath)
     }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //        if indexPath.row == 0 {
-        //            // ToDo: реализовать выбор категории
-        //            print("Нажали кнопку категория")
-        //        } else {
-        //            // ToDo: реализовать выбор расписания
-        //            print("Нажали кнопку расписание")
-        //        }
-        //        tableView.deselectRow(at: indexPath, animated: true)
-    }
 }
 
 extension ScheduleViewController: SwitcherProtocolDelegate {
-    func receiveValue(at cell: TrackerDetailsCell, isSelected: Bool) {
+    func receiveSwitcherValue(at cell: CreateTrackerCell, isSelected: Bool) {
         // Получаем индекс ячейки
         guard let indexPath = daysOfWeekTableView.indexPath(for: cell) else {
             return

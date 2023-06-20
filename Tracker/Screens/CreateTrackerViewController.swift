@@ -1,5 +1,5 @@
 //
-//  CreateTrackerViewController.swift
+//  TrackerDetailsViewController.swift
 //  Tracker
 //
 //  Created by Павел Афанасьев on 19.06.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TrackerDetailsViewController: UIViewController {
+final class CreateTrackerViewController: UIViewController {
     private var trackerOptions: [String] = [] // Опции для отображение в UI, доступные пользователю для выбранного типа трекера (Например расписание)
     private var weekSchedule = WeekSchedule() // Экземпляр модели дни недели для хранения расписания в случае если трекер - привычка
     
@@ -89,14 +89,14 @@ final class TrackerDetailsViewController: UIViewController {
         // ToDo: доработать функционал позже, пока статичная категория
         let category = TrackerCategory(name: "Домашний Уют", trackers: [])
         
-        let trackerName = "Тестовый трекер"
         // ToDo: - Добавить функционал нейминга нового трекера в соотвествии с тем, что ввел пользователь в текстфилде.
+        let trackerName = "Тестовый трекер"
         
         let newTracker = Tracker(name: trackerName,
                                  color: UIColor.randomColor, // ToDo: - Пока рандом - дальше переделать на выбранное пользователем.
                                  emoji: "🔥", // ToDo: - Пока сам указал - дальше переделать на выбранное пользователем.
                                  schedule: weekSchedule)
-        // Собираем словать для передачи через нотификацию на главный экран
+        // Собираем словарь для передачи через нотификацию на главный экран
         let userInfo: [String: Any] = [
             "Category": category,
             "NewTracker": newTracker,
@@ -104,8 +104,6 @@ final class TrackerDetailsViewController: UIViewController {
         
         NotificationCenter.default.post(name: NSNotification.Name("NewTrackerNotification"), object: nil, userInfo: userInfo)
         self.presentingViewController?.presentingViewController?.dismiss(animated: true)
-        print(newTracker.schedule.daysOfWeek)
-
     }
     
     private func setupViews() {
@@ -135,7 +133,7 @@ final class TrackerDetailsViewController: UIViewController {
     private func setupTableView() {
         trackerOptionsTableView.dataSource = self
         trackerOptionsTableView.delegate = self
-        trackerOptionsTableView.register(TrackerDetailsCell.self, forCellReuseIdentifier: TrackerDetailsCell.reuseIdentifier)
+        trackerOptionsTableView.register(CreateTrackerCell.self, forCellReuseIdentifier: CreateTrackerCell.reuseIdentifier)
         trackerOptionsTableView.layer.cornerRadius = 16
     }
     
@@ -149,13 +147,13 @@ final class TrackerDetailsViewController: UIViewController {
 
 // MARK: - UITableViewDataSource
 
-extension TrackerDetailsViewController: UITableViewDataSource {
+extension CreateTrackerViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         trackerOptions.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: TrackerDetailsCell.reuseIdentifier, for: indexPath) as? TrackerDetailsCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: CreateTrackerCell.reuseIdentifier, for: indexPath) as? CreateTrackerCell else {
             return UITableViewCell()
         }
         let cellName = trackerOptions[indexPath.row]
@@ -167,7 +165,7 @@ extension TrackerDetailsViewController: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 
-extension TrackerDetailsViewController: UITableViewDelegate {
+extension CreateTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
     }
@@ -191,7 +189,7 @@ extension TrackerDetailsViewController: UITableViewDelegate {
 }
 
 
-extension TrackerDetailsViewController: ScheduleProtocol {
+extension CreateTrackerViewController: ScheduleProtocol {
     func updateSchedule(weekSchedule: WeekSchedule) {
         self.weekSchedule = weekSchedule
     }

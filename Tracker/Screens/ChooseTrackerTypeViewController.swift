@@ -1,5 +1,5 @@
 //
-//  ChooseTrackerTypeViewController.swift
+//  CreateTrackerViewController.swift
 //  Tracker
 //
 //  Created by Павел Афанасьев on 18.06.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class TrackerTypeViewController: UIViewController {
+final class ChooseTrackerTypeViewController: UIViewController {
     private let pageTitle: UILabel = {
         let label = UILabel()
         label.text = "Создание трекера"
@@ -46,7 +46,7 @@ final class TrackerTypeViewController: UIViewController {
     }
     
     private func presentTrackerDetailsViewController(trackerName: String, category: [String]) {
-        let trackerDetailsViewController = TrackerDetailsViewController()
+        let trackerDetailsViewController = CreateTrackerViewController()
         trackerDetailsViewController.modalPresentationStyle = .formSheet
         let optionsArray = category
         trackerDetailsViewController.configTitleAndOptions(trackerName, optionsArray)
