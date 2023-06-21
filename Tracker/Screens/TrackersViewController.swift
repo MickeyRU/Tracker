@@ -96,14 +96,28 @@ final class TrackersViewController: UIViewController {
 @objc
 private func searchTextFieldValueChanged() {
     // Получаем текст из UISearchTextField
-    let searchText = searchTextField.text ?? ""
-    
-    // Фильтрация трекеров на основе введенного текста
-    filterTrackersBySearchText(searchText)
+    guard let searchText = searchTextField.text else { return }
+    if searchText.isEmpty {
+        self.sortTrackersForChosenDay()
+    } else {
+        filterTrackersBySearchText(searchText)
+    }
 }
 
 private func filterTrackersBySearchText(_ searchText: String) {
+    // Получаем числовое значение текущего дня недели - Понедельник это 0, воскресенье 6
+    let weekDay = getCurrentDaysOfWeekNumber()
     
+    let matchingCategories = categories.map { category -> TrackerCategory in
+        let selectedTrackers = category.trackers.filter { tracker in
+            let isNameMatch = tracker.name.localizedCaseInsensitiveContains(searchText)
+            let isDayOfWeekMatch = tracker.schedule.daysOfWeek[weekDay].isSelected
+            return isNameMatch && isDayOfWeekMatch
+        }
+        return TrackerCategory(name: category.name, trackers: selectedTrackers)
+    }
+    visibleCategories = matchingCategories
+    trackersCollectionView.reloadData()
 }
 
 private func getCurrentDaysOfWeekNumber() -> Int {
