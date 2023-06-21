@@ -87,7 +87,7 @@ final class CreateTrackerViewController: UIViewController {
     private func createButtonTapped() {
         // При нажатии на кнопку у нас создается категория выбранная пользователем и трекер
         // ToDo: доработать функционал позже, пока статичная категория
-        let category = TrackerCategory(name: "Домашний Уют", trackers: [])
+        let category = TrackerCategory(name: "Учимся кодить", trackers: [])
         
         // ToDo: - Добавить функционал нейминга нового трекера в соотвествии с тем, что ввел пользователь в текстфилде.
         let trackerName = "Тестовый трекер"

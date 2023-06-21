@@ -9,10 +9,18 @@ import UIKit
 
 final class TrackersViewController: UIViewController {
     // Список категорий и вложенных в них трекеров
-    private var categories: [TrackerCategory] = [TrackerCategory(name: "Домашний Уют", trackers: [])]
+    private var categories = [TrackerCategory]()
     
-    // Список видимых категорий при работы с поиском
-    private var visibleCategories: [TrackerCategory] = []
+    // Список видимых категорий с учетом текущей даты в пикере.
+    private var visibleTrackersCategoryForDay = [TrackerCategory]()
+    
+    private var visibleTrackersCategoriesAfterFilter = [TrackerCategory]()
+    
+    private var isFiltered: Bool  {
+        let searchText = searchTextField.text ?? ""
+        return !searchText.isEmpty
+    }
+    
     
     // Трекеры, которые были «выполнены» в выбранную дату
     private var completedTrackers: Set<TrackerRecord> = []
@@ -20,10 +28,11 @@ final class TrackersViewController: UIViewController {
     // Параметры для настройки размеров коллекции
     private var params = GeometricParams(cellCount: 2, leftInset: 16, rightInset: 16, cellSpacing: 9)
     
-    private let datePicker: UIDatePicker = {
+    private lazy var datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
         datePicker.preferredDatePickerStyle = .compact
         datePicker.datePickerMode = .date
+        datePicker.addTarget(self, action: #selector(showTrackersOnDate), for: .valueChanged)
         return datePicker
     }()
     
@@ -31,6 +40,7 @@ final class TrackersViewController: UIViewController {
     private let searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
         textField.placeholder = "Поиск"
+        textField.addTarget(self, action: #selector(searchTextFieldValueChanged), for: .editingChanged)
         return textField
     }()
     
@@ -51,29 +61,100 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc
+    private func showTrackersOnDate() {
+        // Получаем выбранную дату из UIDatePicker
+        let selectedDate = datePicker.date
+        
+        // Фильтрация трекеров на основе выбранного дня недели
+        filterTrackersForSelectedDayOfWeek(selectedDate)
+    }
+    
+    @objc
+    private func searchTextFieldValueChanged() {
+        // Получаем текст из UISearchTextField
+        let searchText = searchTextField.text ?? ""
+        
+        // Фильтрация трекеров на основе введенного текста
+        filterTrackersBySearchText(searchText)
+    }
+    
+    
+    private func filterTrackersForSelectedDayOfWeek(_ selectedDate: Date) {
+        // Получаем день недели для выбранной даты
+        let selectedDayOfWeek = Calendar.current.component(.weekday, from: selectedDate) - 1
+        // Фильтруем трекеры по выбранному дню недели
+        let filteredTrackers = categories.flatMap { $0.trackers.filter { $0.schedule.daysOfWeek[selectedDayOfWeek - 1].isSelected } }
+        // Обновляем видимые категории трекеров
+        visibleTrackersCategoryForDay = createVisibleCategories(from: filteredTrackers)
+        
+        // Обновляем коллекцию для отображения трекеров
+        trackersCollectionView.reloadData()
+    }
+    
+    private func filterTrackersBySearchText(_ searchText: String) {
+        // Фильтруем трекеры по введенному тексту
+        let filteredTrackers = categories.flatMap { $0.trackers.filter { $0.name.lowercased().contains(searchText.lowercased()) } }
+        
+        // Обновляем видимые категории трекеров
+        visibleTrackersCategoriesAfterFilter = createVisibleCategories(from: filteredTrackers)
+        
+        // Обновляем коллекцию для отображения трекеров
+        trackersCollectionView.reloadData()
+    }
+    
+    private func createVisibleCategories(from trackers: [Tracker]) -> [TrackerCategory] {
+        var categoriesDict: [String: [Tracker]] = [:]
+        
+        // Группируем трекеры по имени категории в словаре
+        for tracker in trackers {
+            let categoryName = tracker.name
+            if var trackersArray = categoriesDict[categoryName] {
+                trackersArray.append(tracker)
+                categoriesDict[categoryName] = trackersArray
+            } else {
+                categoriesDict[categoryName] = [tracker]
+            }
+        }
+        
+        // Создаем массив видимых категорий на основе значений словаря
+        let visibleCategories = categoriesDict.map { TrackerCategory(name: $0.key, trackers: $0.value) }
+        
+        return visibleCategories
+    }
+    
+    
+    @objc
     private func handleNewTrackerNotification(_ notification: Notification) {
         if let userInfo = notification.userInfo {
             if let category = userInfo["Category"] as? TrackerCategory,
                let tracker = userInfo["NewTracker"] as? Tracker {
+                // Если категория уже существует в главное хранилище трекеров "categories", то обновляем
                 if let index = self.categories.firstIndex(where: {$0.name == category.name}) {
                     let oldCategory = self.categories.remove(at: index)
                     let oldTrackersArray = oldCategory.trackers
-
+                    
                     // Создаем новый массив трекеров, добавляя новый трекер
                     var updatedTrackersArray = oldTrackersArray
                     updatedTrackersArray.append(tracker)
-
+                    
                     // Создаем новый экземпляр TrackerCategory с обновленным списком трекеров
                     let updatedCategory = TrackerCategory(name: oldCategory.name, trackers: updatedTrackersArray)
-
+                    
                     self.categories.insert(updatedCategory, at: index)
                 } else {
-                    //            ToDo: - если новая категория прилетает, доработать функционал:
-                    //            let newCategory = TrackerCategory(name: categoryName, trackers: [tracker])
-                    //            self.categories.append(newCategory)
+                    let newCategory = TrackerCategory(name: category.name, trackers: [tracker])
+                    self.categories.append(newCategory)
                 }
-                DispatchQueue.main.async {
-                    self.trackersCollectionView.reloadData()
+                
+                if isFiltered {
+                    let TrackersCategoriesArrayForUpdate = visibleTrackersCategoriesAfterFilter
+                    DispatchQueue.main.async {
+                        self.trackersCollectionView.reloadData()
+                    }
+                } else {
+                    let TrackersCategoriesArrayForUpdate = visibleTrackersCategoryForDay
+                    let selectedDate = datePicker.date
+                    filterTrackersForSelectedDayOfWeek(selectedDate)
                 }
             }
         }
@@ -110,6 +191,7 @@ final class TrackersViewController: UIViewController {
         updateTrackersForSelectedDate(selectedDate)
     }
     
+    
     private func updateTrackersForSelectedDate(_ date: Date) {
         // Обновление отображаемых трекеров привычек на основе выбранной даты
         // ToDo: - При изменении даты отображаются трекеры привычек, которые должны быть видны в день недели, выбранный в UIDatePicker
@@ -140,39 +222,37 @@ final class TrackersViewController: UIViewController {
     }
 }
 
-// MARK: - UITextFieldDelegate
-
-extension TrackersViewController: UITextFieldDelegate {
-    // ToDo: - реализация изменений в коллекции при вводе в поисковую строку
-}
+// MARK: - UICollectionViewDataSource
 
 extension TrackersViewController: UICollectionViewDataSource {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        isFiltered ? visibleTrackersCategoriesAfterFilter.count : visibleTrackersCategoryForDay.count
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.categories[section].trackers.count
-        //        visibleCategories.count
-        //    ToDo: - Согласно ТЗ чтобы при поиске и/или изменении дня недели отображался другой набор трекеров, рекомендуем параллельно со свойством categories добавить свойство visibleCategories: [TrackerCategory]. Например, это пригодится в случае, когда пользователь вбивает текст в UISearchTextField — содержимое массива categories будет отфильтровываться. При реализации UICollectionViewDataSource нужно использовать visibleCategories. Допускается использовать collectionView.reloadData() после обновления значения visibleCategories (при желании можно использовать collectionView.performBatchUpdates)
+        let trackersCategoriesArray = isFiltered ? visibleTrackersCategoriesAfterFilter : visibleTrackersCategoryForDay
+        let category = trackersCategoriesArray[section]
+        return category.trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCell.reuseIdentifier, for: indexPath) as? TrackerCell else { return UICollectionViewCell() }
         cell.delegate = self
         
-        if let category = categories[safe: indexPath.section], category.trackers.indices.contains(indexPath.row) {
-            let tracker = category.trackers[indexPath.row]
-            cell.trackerTextLabel.text = tracker.name
-            cell.emoji.text = tracker.emoji
-        } else {
-            print("Пусто")
-            // ToDo: - Массив trackers пуст или индекс выходит за пределы массива
-            // Выполнить альтернативное действие или установите значение по умолчанию
-        }
+        let trackersCategoriesArray = isFiltered ? visibleTrackersCategoriesAfterFilter : visibleTrackersCategoryForDay
+        let tracker = trackersCategoriesArray[indexPath.section].trackers[indexPath.row]
+        cell.emoji.text = tracker.emoji
+        cell.trackerTextLabel.text = tracker.name
+        cell.backGroundViewColor.backgroundColor = tracker.color
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let view = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! SupplementaryView
-        view.titleLabel.text = "Домашний уют"
-        return view
+        let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! SupplementaryView
+        let trackersCategoriesArray = isFiltered ? visibleTrackersCategoriesAfterFilter : visibleTrackersCategoryForDay
+        let category = trackersCategoriesArray[indexPath.section]
+        headerView.titleLabel.text = category.name
+        return headerView
     }
 }
 
@@ -201,7 +281,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
                                                   verticalFittingPriority: .fittingSizeLevel)
     }
 }
- 
+
 // MARK: - DaysCountProtocol
 
 extension TrackersViewController: DaysCountProtocol {
