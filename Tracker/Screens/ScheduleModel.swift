@@ -9,17 +9,17 @@ import Foundation
 
 struct DaysOfWeek {
     let name: String
-    var isSelected: Bool
+    var isCompleted: Bool
 }
 
 struct WeekSchedule {
     var daysOfWeek = [
-        DaysOfWeek(name: "Понедельник", isSelected: false),
-        DaysOfWeek(name: "Вторник", isSelected: false),
-        DaysOfWeek(name: "Среда", isSelected: false),
-        DaysOfWeek(name: "Четверг", isSelected: false),
-        DaysOfWeek(name: "Пятница", isSelected: false),
-        DaysOfWeek(name: "Суббота", isSelected: false),
-        DaysOfWeek(name: "Воскресенье", isSelected: false),
+        DaysOfWeek(name: "Понедельник", isCompleted: false),
+        DaysOfWeek(name: "Вторник", isCompleted: false),
+        DaysOfWeek(name: "Среда", isCompleted: false),
+        DaysOfWeek(name: "Четверг", isCompleted: false),
+        DaysOfWeek(name: "Пятница", isCompleted: false),
+        DaysOfWeek(name: "Суббота", isCompleted: false),
+        DaysOfWeek(name: "Воскресенье", isCompleted: false),
     ]
 }

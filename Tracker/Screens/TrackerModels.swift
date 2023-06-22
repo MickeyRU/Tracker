@@ -8,11 +8,19 @@
 import UIKit
 
 struct Tracker {
-    let id: UUID = UUID()
+    let id: UUID
     let name: String
     let color: UIColor
     let emoji: String
     let schedule: WeekSchedule
+    
+    init(name: String, color: UIColor, emoji: String, schedule: WeekSchedule) {
+        self.id = UUID()
+        self.name = name
+        self.color = color
+        self.emoji = emoji
+        self.schedule = schedule
+    }
 }
 
 struct TrackerCategory {
@@ -21,6 +29,6 @@ struct TrackerCategory {
 }
 
 struct TrackerRecord: Hashable {
-    let id: UUID
+    let trackerID: UUID
     let date: Date
 }

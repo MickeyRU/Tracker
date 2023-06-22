@@ -118,6 +118,6 @@ extension ScheduleViewController: SwitcherProtocolDelegate {
         guard let indexPath = daysOfWeekTableView.indexPath(for: cell) else {
             return
         }
-        weekSchedule.daysOfWeek[indexPath.row].isSelected = isSelected
+        weekSchedule.daysOfWeek[indexPath.row].isCompleted = isSelected
     }
 }

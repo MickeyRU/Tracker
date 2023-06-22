@@ -8,7 +8,7 @@
 import UIKit
 
 protocol DaysCountProtocol: AnyObject {
-    func changeDaysCount(at cell: TrackerCell, isDayCountIncreased: Bool)
+    func changeDaysCount(at cell: TrackerCell, isDayCountIncreased: Bool, tracker: Tracker)
 }
 
 final class TrackerCell: UICollectionViewCell {
@@ -16,19 +16,21 @@ final class TrackerCell: UICollectionViewCell {
     
     static let reuseIdentifier = "TrackerCell"
     
-    var backGroundViewColor: UIView = {
+    private var tracker: Tracker?
+    
+    private var backGroundViewColor: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(red: 0.2, green: 0.81, blue: 0.41, alpha: 1.0)
         view.layer.cornerRadius = 16
         return view
     }()
     
-    var emoji: UILabel = {
+    private var emojiLabel: UILabel = {
         let label = UILabel()
         return label
     }()
     
-    var trackerTextLabel: UILabel = {
+    private var trackerTextLabel: UILabel = {
         let label = UILabel()
         label.text = "Поливать растения"
         label.textColor = .white
@@ -36,16 +38,15 @@ final class TrackerCell: UICollectionViewCell {
         return label
     }()
     
-    var completedDaysLabel: UILabel = {
+    private var completedDaysLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         label.text = "0 дней"
         return label
     }()
     
-    private let addDaysButton: UIButton = {
+    private var addDaysButton: UIButton = {
         let button = UIButton()
-        button.setImage(Images.addDaysButtonImage, for: .normal)
         button.addTarget(self, action: #selector(addDaysButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -64,17 +65,40 @@ final class TrackerCell: UICollectionViewCell {
     @objc
     private func addDaysButtonTapped() {
         isAddDaysButtonTapped = !isAddDaysButtonTapped
-        delegate?.changeDaysCount(at: self, isDayCountIncreased: isAddDaysButtonTapped)
+        guard let tracker = tracker else { return }
+        delegate?.changeDaysCount(at: self, isDayCountIncreased: isAddDaysButtonTapped, tracker: tracker)
         if isAddDaysButtonTapped {
-            addDaysButton.setImage(Images.addDaysButtonClickedImage, for: .normal)
+            self.addDaysButton.setImage(Images.addDaysButtonClickedImage?.withRenderingMode(.alwaysTemplate), for: .normal)
         } else {
-            addDaysButton.setImage(Images.addDaysButtonImage, for: .normal)
+            self.addDaysButton.setImage(Images.addDaysButtonImage?.withRenderingMode(.alwaysTemplate), for: .normal)
         }
-        // ToDo: - С помощью кнопки можно добавить запись, что этот трекер нужно пометить как выполненный для даты, выбранной в UIDatePicker.
+    }
+    
+    func configCell(tracker: Tracker, trackerRecordsCount: Int, isButtonTapped: Bool) {
+        isAddDaysButtonTapped = isButtonTapped
+        self.tracker = tracker
+        self.emojiLabel.text = tracker.emoji
+        self.trackerTextLabel.text = tracker.name
+        self.backGroundViewColor.backgroundColor = tracker.color
+        self.addDaysButton.tintColor = tracker.color
+        
+        if isButtonTapped {
+            self.addDaysButton.setImage(Images.addDaysButtonClickedImage?.withRenderingMode(.alwaysTemplate), for: .normal)
+        } else {
+            self.addDaysButton.setImage(Images.addDaysButtonImage?.withRenderingMode(.alwaysTemplate), for: .normal)
+        }
+        
+        updateDayCountLabel(count: trackerRecordsCount)
+    }
+    
+    func updateDayCountLabel(count: Int) {
+        // Формируем итоговый лейбл с учетом склонения слова "день"
+        let formattedLabel = formatDayLabel(daysCount: count)
+        self.completedDaysLabel.text = formattedLabel
     }
     
     private func setupViews() {
-        [backGroundViewColor, emoji, trackerTextLabel, addDaysButton, completedDaysLabel].forEach { contentView.addViewsWithNoTAMIC($0) }
+        [backGroundViewColor, emojiLabel, trackerTextLabel, addDaysButton, completedDaysLabel].forEach { contentView.addViewsWithNoTAMIC($0) }
         
         NSLayoutConstraint.activate([
             backGroundViewColor.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -82,12 +106,12 @@ final class TrackerCell: UICollectionViewCell {
             backGroundViewColor.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             backGroundViewColor.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.6),
             
-            emoji.widthAnchor.constraint(equalToConstant: 24),
-            emoji.heightAnchor.constraint(equalTo: emoji.widthAnchor, multiplier: 1),
-            emoji.topAnchor.constraint(equalTo: backGroundViewColor.topAnchor, constant: 12),
-            emoji.leadingAnchor.constraint(equalTo: backGroundViewColor.leadingAnchor, constant: 12),
+            emojiLabel.widthAnchor.constraint(equalToConstant: 24),
+            emojiLabel.heightAnchor.constraint(equalTo: emojiLabel.widthAnchor, multiplier: 1),
+            emojiLabel.topAnchor.constraint(equalTo: backGroundViewColor.topAnchor, constant: 12),
+            emojiLabel.leadingAnchor.constraint(equalTo: backGroundViewColor.leadingAnchor, constant: 12),
             
-            trackerTextLabel.leadingAnchor.constraint(equalTo: emoji.leadingAnchor),
+            trackerTextLabel.leadingAnchor.constraint(equalTo: emojiLabel.leadingAnchor),
             trackerTextLabel.bottomAnchor.constraint(equalTo: backGroundViewColor.bottomAnchor, constant: -12),
             trackerTextLabel.trailingAnchor.constraint(equalTo: backGroundViewColor.trailingAnchor, constant: -12),
             
@@ -100,5 +124,21 @@ final class TrackerCell: UICollectionViewCell {
             completedDaysLabel.leadingAnchor.constraint(equalTo: trackerTextLabel.leadingAnchor),
             completedDaysLabel.trailingAnchor.constraint(equalTo: addDaysButton.leadingAnchor, constant: -8)
         ])
+    }
+    
+    private func formatDayLabel(daysCount: Int) -> String {
+        let suffix: String
+        
+        if daysCount % 10 == 1 && daysCount % 100 != 11 {
+            suffix = "день"
+        } else if (daysCount % 10 == 2 && daysCount % 100 != 12) ||
+                    (daysCount % 10 == 3 && daysCount % 100 != 13) ||
+                    (daysCount % 10 == 4 && daysCount % 100 != 14) {
+            suffix = "дня"
+        } else {
+            suffix = "дней"
+        }
+        
+        return "\(daysCount) \(suffix)"
     }
 }

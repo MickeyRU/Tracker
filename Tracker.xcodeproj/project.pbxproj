@@ -129,8 +129,8 @@
 		BE1E62BF2A3F8AD8002185B2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				BE1E62BD2A3F89F8002185B2 /* TrackerModels.swift */,
 				BE1E62C12A3F8B44002185B2 /* GeometricParams.swift */,
+				BE1E62BD2A3F89F8002185B2 /* TrackerModels.swift */,
 				BEEE7C552A41AAFF00315F2D /* ScheduleModel.swift */,
 			);
 			name = Models;

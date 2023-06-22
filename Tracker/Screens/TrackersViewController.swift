@@ -8,13 +8,13 @@
 import UIKit
 
 final class TrackersViewController: UIViewController {
-    // Список категорий и вложенных в них трекеров
+    // Категории для работы с логикой добавления / удаления трекеров
     private var categories = [TrackerCategory]()
     
-    // Список категорий для отображения в UI
+    // Категории для отображения в UI
     private var visibleCategories = [TrackerCategory]()
     
-    // Трекеры, которые были «выполнены» в выбранную дату
+    // Выполненные трекеры
     private var completedTrackers: Set<TrackerRecord> = []
     
     // Текущая дата
@@ -82,7 +82,7 @@ final class TrackersViewController: UIViewController {
         // Фильтруем массив categories и находим все трекеры с разбивкой по категория и возвращаем обновленный массив категорий.
         let matchingCategories = categories.map { category -> TrackerCategory in
             let selectedTrackers = category.trackers.filter { tracker in
-                return tracker.schedule.daysOfWeek[weekDay].isSelected
+                return tracker.schedule.daysOfWeek[weekDay].isCompleted
             }
             return TrackerCategory(name: category.name, trackers: selectedTrackers)
         }
@@ -111,7 +111,7 @@ private func filterTrackersBySearchText(_ searchText: String) {
     let matchingCategories = categories.map { category -> TrackerCategory in
         let selectedTrackers = category.trackers.filter { tracker in
             let isNameMatch = tracker.name.localizedCaseInsensitiveContains(searchText)
-            let isDayOfWeekMatch = tracker.schedule.daysOfWeek[weekDay].isSelected
+            let isDayOfWeekMatch = tracker.schedule.daysOfWeek[weekDay].isCompleted
             return isNameMatch && isDayOfWeekMatch
         }
         return TrackerCategory(name: category.name, trackers: selectedTrackers)
@@ -160,7 +160,7 @@ private func handleNewTrackerNotification(_ notification: Notification) {
             
             // Получаем числовое значение текущего дня недели - Понедельник это 0, воскресенье 6
             let weekDay = getCurrentDaysOfWeekNumber()
-            if tracker.schedule.daysOfWeek[weekDay].isSelected {
+            if tracker.schedule.daysOfWeek[weekDay].isCompleted {
                 self.trackersCollectionView.reloadData()
             } else {
                 print("Трекер создан на день отличный от текущего ")
@@ -176,7 +176,7 @@ private func setupNavigationBar() {
     navigationItem.title = "Трекеры"
     
     // Создание UIBarButtonItem с кнопкой "+"
-    let addButton = UIBarButtonItem(image: Images.addButtonImage, style: .plain, target: self, action: #selector(addButtonTapped))
+    let addButton = UIBarButtonItem(image: Images.addTrackerButtonImage, style: .plain, target: self, action: #selector(addButtonTapped))
     addButton.tintColor = .black
     navigationItem.leftBarButtonItem = addButton
     
@@ -236,9 +236,11 @@ extension TrackersViewController: UICollectionViewDataSource {
         cell.delegate = self
         
         let tracker = visibleCategories[indexPath.section].trackers[indexPath.row]
-        cell.emoji.text = tracker.emoji
-        cell.trackerTextLabel.text = tracker.name
-        cell.backGroundViewColor.backgroundColor = tracker.color
+        let trackerRecordsCount = completedTrackers.filter {$0.trackerID == tracker.id}.count
+        // Выполнен ли трекер в текущий день
+        let isButtonTapped = !completedTrackers.filter{ $0.date == currentDate }.isEmpty
+        print("Нажата ли кнопка в базе ? \(isButtonTapped)")
+        cell.configCell(tracker: tracker, trackerRecordsCount: trackerRecordsCount, isButtonTapped: isButtonTapped)
         return cell
     }
     
@@ -279,29 +281,28 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - DaysCountProtocol
 
 extension TrackersViewController: DaysCountProtocol {
-    func changeDaysCount(at cell: TrackerCell, isDayCountIncreased: Bool) {
-        guard let currentDaysCount = cell.completedDaysLabel.text else { return }
-        let currentDaysDigitString = currentDaysCount.filter {$0.isNumber}
-        guard let number = Int(currentDaysDigitString) else { return }
-        var changedNumber = number
+    func changeDaysCount(at cell: TrackerCell, isDayCountIncreased: Bool, tracker: Tracker) {
+        var trackerRecordsCount = completedTrackers.filter { $0.trackerID == tracker.id }.count
+        print(trackerRecordsCount)
         if isDayCountIncreased {
-            changedNumber += 1
+            addTrackerRecord(tracker: tracker)
+            trackerRecordsCount += 1
         } else {
-            changedNumber -= 1
+            removeTrackerRecord(tracker: tracker)
+            trackerRecordsCount -= 1
         }
-        let formattedLabel = formatDayLabel(for: changedNumber)
-        cell.completedDaysLabel.text = formattedLabel
+        cell.updateDayCountLabel(count: trackerRecordsCount)
+        print(trackerRecordsCount)
+
     }
     
-    // Для склонения слова "день" в зависимости от числа "1" существует правило: если число заканчивается на "1" и не является числом "11", то используется форма "день"; в остальных случаях используется форма "дня".
-    private func formatDayLabel(for number: Int) -> String {
-        let lastDigit = number % 10
-        let lastTwoDigits = number % 100
-        
-        if lastDigit == 1 && lastTwoDigits != 11 {
-            return "\(number) день"
-        } else {
-            return "\(number) дней"
-        }
+    private func addTrackerRecord(tracker: Tracker) {
+        let trackerRecord = TrackerRecord(trackerID: tracker.id, date: currentDate)
+        completedTrackers.insert(trackerRecord)
+    }
+    
+    private func removeTrackerRecord(tracker: Tracker) {
+        let trackerRecord = TrackerRecord(trackerID: tracker.id, date: currentDate)
+        completedTrackers.remove(trackerRecord)
     }
 }
