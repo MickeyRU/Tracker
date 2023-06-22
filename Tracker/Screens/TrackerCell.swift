@@ -67,11 +67,6 @@ final class TrackerCell: UICollectionViewCell {
         isAddDaysButtonTapped = !isAddDaysButtonTapped
         guard let tracker = tracker else { return }
         delegate?.changeDaysCount(at: self, isDayCountIncreased: isAddDaysButtonTapped, tracker: tracker)
-        if isAddDaysButtonTapped {
-            self.addDaysButton.setImage(Images.addDaysButtonClickedImage?.withRenderingMode(.alwaysTemplate), for: .normal)
-        } else {
-            self.addDaysButton.setImage(Images.addDaysButtonImage?.withRenderingMode(.alwaysTemplate), for: .normal)
-        }
     }
     
     func configCell(tracker: Tracker, trackerRecordsCount: Int, isButtonTapped: Bool) {
@@ -82,19 +77,19 @@ final class TrackerCell: UICollectionViewCell {
         self.backGroundViewColor.backgroundColor = tracker.color
         self.addDaysButton.tintColor = tracker.color
         
-        if isButtonTapped {
+        updateDayCountLabelAndButton(count: trackerRecordsCount)
+    }
+    
+    func updateDayCountLabelAndButton(count: Int) {
+        // Формируем итоговый лейбл с учетом склонения слова "день"
+        let formattedLabel = formatDayLabel(daysCount: count)
+        self.completedDaysLabel.text = formattedLabel
+        
+        if isAddDaysButtonTapped {
             self.addDaysButton.setImage(Images.addDaysButtonClickedImage?.withRenderingMode(.alwaysTemplate), for: .normal)
         } else {
             self.addDaysButton.setImage(Images.addDaysButtonImage?.withRenderingMode(.alwaysTemplate), for: .normal)
         }
-        
-        updateDayCountLabel(count: trackerRecordsCount)
-    }
-    
-    func updateDayCountLabel(count: Int) {
-        // Формируем итоговый лейбл с учетом склонения слова "день"
-        let formattedLabel = formatDayLabel(daysCount: count)
-        self.completedDaysLabel.text = formattedLabel
     }
     
     private func setupViews() {

@@ -8,11 +8,11 @@
 import UIKit
 
 struct Images {
-    // Таббар изображения
     static let trackerTabBarImage = UIImage(named: "trackerTabBarImage")
     static let statisticsTabBarImage = UIImage(named: "statisticsTabBarImage")
     static let addTrackerButtonImage = UIImage(named: "addTrackerButtonImage")
     static let addDaysButtonImage = UIImage(named: "addDaysButtonImage")
     static let addDaysButtonClickedImage = UIImage(named: "addDaysButtonClickedImage")
     static let arrowImage = UIImage(named: "arrowImage")
+    static let emptyOnScreenImage = UIImage(named: "emptyOnScreenImage")
 }
