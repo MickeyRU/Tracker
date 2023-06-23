@@ -17,9 +17,9 @@ enum CellElement {
 }
 
 final class CreateTrackerCell: UITableViewCell {
-    weak var delegate: SwitcherProtocolDelegate?
-    
     static let reuseIdentifier = "CreateTrackerCell:"
+
+    weak var delegate: SwitcherProtocolDelegate?
     
     private var isSwitchSelected = false
     
@@ -42,7 +42,7 @@ final class CreateTrackerCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configurate(nameLabel: String, element: CellElement) {
+    func configCell(nameLabel: String, element: CellElement) {
         self.cellNameLabel.text = nameLabel
         
         // В зависимости от входного элемента настраиваем нужный UI элемент для экрана.
@@ -73,12 +73,6 @@ final class CreateTrackerCell: UITableViewCell {
         }
     }
     
-    @objc
-    private func switchValueDidChanged() {
-        isSwitchSelected = !isSwitchSelected
-        delegate?.receiveSwitcherValue(at: self, isSelected: isSwitchSelected)
-    }
-    
     private func setupViews() {
         contentView.addViewsWithNoTAMIC(cellNameLabel)
         
@@ -86,5 +80,11 @@ final class CreateTrackerCell: UITableViewCell {
             cellNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             cellNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
         ])
+    }
+    
+    @objc
+    private func switchValueDidChanged() {
+        isSwitchSelected = !isSwitchSelected
+        delegate?.receiveSwitcherValue(at: self, isSelected: isSwitchSelected)
     }
 }

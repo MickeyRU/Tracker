@@ -8,7 +8,6 @@
 import UIKit
 
 final class MainTabBarController: UITabBarController {
-    
     private let trackersViewController = TrackersViewController()
     private let statisticsViewController = StatisticsViewController()
     

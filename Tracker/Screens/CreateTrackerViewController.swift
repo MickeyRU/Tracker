@@ -77,35 +77,7 @@ final class CreateTrackerViewController: UIViewController {
         self.pageTitle.text = title
         self.trackerOptions = options
     }
-    
-    @objc
-    private func cancelButtonTapped() {
-        dismiss(animated: true)
-    }
-    
-    @objc
-    private func createButtonTapped() {
-        // При нажатии на кнопку у нас создается категория выбранная пользователем и трекер
-        // ToDo: доработать функционал позже, пока статичная категория
-        let category = TrackerCategory(name: "Учимся кодить", trackers: [])
         
-        // ToDo: - Добавить функционал нейминга нового трекера в соотвествии с тем, что ввел пользователь в текстфилде.
-        let trackerName = "Тестовый трекер"
-        
-        let newTracker = Tracker(name: trackerName,
-                                 color: UIColor.randomColor, // ToDo: - Пока рандом - дальше переделать на выбранное пользователем.
-                                 emoji: "🔥", // ToDo: - Пока сам указал - дальше переделать на выбранное пользователем.
-                                 schedule: weekSchedule)
-        // Собираем словарь для передачи через нотификацию на главный экран
-        let userInfo: [String: Any] = [
-            "Category": category,
-            "NewTracker": newTracker,
-        ]
-        
-        NotificationCenter.default.post(name: NSNotification.Name("NewTrackerNotification"), object: nil, userInfo: userInfo)
-        self.presentingViewController?.presentingViewController?.dismiss(animated: true)
-    }
-    
     private func setupViews() {
         [pageTitle, trackerNameTextField, trackerOptionsTableView, buttonStackView].forEach { view.addViewsWithNoTAMIC($0) }
         
@@ -143,6 +115,34 @@ final class CreateTrackerViewController: UIViewController {
         buttonStackView.axis = .horizontal
         buttonStackView.distribution = .fillEqually
     }
+    
+    @objc
+    private func cancelButtonTapped() {
+        dismiss(animated: true)
+    }
+    
+    @objc
+    private func createButtonTapped() {
+        // При нажатии на кнопку у нас создается категория выбранная пользователем и трекер
+        // ToDo: доработать функционал позже, пока статичная категория
+        let category = TrackerCategory(name: "Учимся кодить", trackers: [])
+        
+        // ToDo: - Добавить функционал нейминга нового трекера в соотвествии с тем, что ввел пользователь в текстфилде.
+        let trackerName = "Тестовый трекер"
+        
+        let newTracker = Tracker(name: trackerName,
+                                 color: UIColor.randomColor, // ToDo: - Пока рандом - дальше переделать на выбранное пользователем.
+                                 emoji: "🔥", // ToDo: - Пока сам указал - дальше переделать на выбранное пользователем.
+                                 schedule: weekSchedule)
+        // Собираем словарь для передачи через нотификацию на главный экран
+        let userInfo: [String: Any] = [
+            "Category": category,
+            "NewTracker": newTracker,
+        ]
+        
+        NotificationCenter.default.post(name: NSNotification.Name("NewTrackerNotification"), object: nil, userInfo: userInfo)
+        self.presentingViewController?.presentingViewController?.dismiss(animated: true)
+    }
 }
 
 // MARK: - UITableViewDataSource
@@ -158,7 +158,7 @@ extension CreateTrackerViewController: UITableViewDataSource {
         }
         let cellName = trackerOptions[indexPath.row]
         let cellAdditionalUIElement = CellElement.arrowImageView
-        cell.configurate(nameLabel: cellName, element: cellAdditionalUIElement)
+        cell.configCell(nameLabel: cellName, element: cellAdditionalUIElement)
         return cell
     }
 }

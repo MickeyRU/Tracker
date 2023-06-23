@@ -53,16 +53,6 @@ final class ChooseTrackerTypeViewController: UIViewController {
         present(trackerDetailsViewController, animated: true)
     }
 
-    @objc
-    private func habitButtonDidTapped() {
-        presentTrackerDetailsViewController(trackerName: "Новая привычка", category: ["Категория", "Расписание"])
-    }
-    
-    @objc
-    private func irregularEvenButtonDidTapped() {
-        presentTrackerDetailsViewController(trackerName: "Новое нерегулярное событие", category: ["Категория"])
-    }
-    
     private func setupViews() {
         [pageTitle, habitButton, irregularEventButton].forEach { view.addViewsWithNoTAMIC($0) }
         
@@ -80,5 +70,15 @@ final class ChooseTrackerTypeViewController: UIViewController {
             irregularEventButton.trailingAnchor.constraint(equalTo: habitButton.trailingAnchor),
             irregularEventButton.heightAnchor.constraint(equalTo: habitButton.heightAnchor)
         ])
+    }
+    
+    @objc
+    private func habitButtonDidTapped() {
+        presentTrackerDetailsViewController(trackerName: "Новая привычка", category: ["Категория", "Расписание"])
+    }
+    
+    @objc
+    private func irregularEvenButtonDidTapped() {
+        presentTrackerDetailsViewController(trackerName: "Новое нерегулярное событие", category: ["Категория"])
     }
 }

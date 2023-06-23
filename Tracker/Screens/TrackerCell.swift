@@ -12,11 +12,12 @@ protocol DaysCountProtocol: AnyObject {
 }
 
 final class TrackerCell: UICollectionViewCell {
-    weak var delegate: DaysCountProtocol?
-    
     static let reuseIdentifier = "TrackerCell"
     
+    weak var delegate: DaysCountProtocol?
+
     private var tracker: Tracker?
+    private var isAddDaysButtonTapped = false
     
     private var backGroundViewColor: UIView = {
         let view = UIView()
@@ -51,8 +52,6 @@ final class TrackerCell: UICollectionViewCell {
         return button
     }()
     
-    private var isAddDaysButtonTapped = false
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -60,13 +59,6 @@ final class TrackerCell: UICollectionViewCell {
     
     required  init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    @objc
-    private func addDaysButtonTapped() {
-        isAddDaysButtonTapped = !isAddDaysButtonTapped
-        guard let tracker = tracker else { return }
-        delegate?.changeDaysCount(at: self, isDayCountIncreased: isAddDaysButtonTapped, tracker: tracker)
     }
     
     func configCell(tracker: Tracker, trackerRecordsCount: Int, isButtonTapped: Bool) {
@@ -86,9 +78,9 @@ final class TrackerCell: UICollectionViewCell {
         self.completedDaysLabel.text = formattedLabel
         
         if isAddDaysButtonTapped {
-            self.addDaysButton.setImage(Images.addDaysButtonClickedImage?.withRenderingMode(.alwaysTemplate), for: .normal)
+            self.addDaysButton.setImage(Images.addDaysButtonClickedImage, for: .normal)
         } else {
-            self.addDaysButton.setImage(Images.addDaysButtonImage?.withRenderingMode(.alwaysTemplate), for: .normal)
+            self.addDaysButton.setImage(Images.addDaysButtonImage, for: .normal)
         }
     }
     
@@ -135,5 +127,12 @@ final class TrackerCell: UICollectionViewCell {
         }
         
         return "\(daysCount) \(suffix)"
+    }
+    
+    @objc
+    private func addDaysButtonTapped() {
+        isAddDaysButtonTapped = !isAddDaysButtonTapped
+        guard let tracker = tracker else { return }
+        delegate?.changeDaysCount(at: self, isDayCountIncreased: isAddDaysButtonTapped, tracker: tracker)
     }
 }

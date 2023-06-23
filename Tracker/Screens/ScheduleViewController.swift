@@ -47,13 +47,7 @@ final class ScheduleViewController: UIViewController {
         setupViews()
         setupTableView()
     }
-    
-    @objc
-    private func doneButtonTapped() {
-        delegate?.updateSchedule(weekSchedule: self.weekSchedule)
-        dismiss(animated: true)
-    }
-    
+        
     private func setupViews() {
         [pageTitle, daysOfWeekTableView, doneButton].forEach { view.addViewsWithNoTAMIC($0) }
         
@@ -79,6 +73,12 @@ final class ScheduleViewController: UIViewController {
         daysOfWeekTableView.register(CreateTrackerCell.self, forCellReuseIdentifier: CreateTrackerCell.reuseIdentifier)
         daysOfWeekTableView.layer.cornerRadius = 16
     }
+    
+    @objc
+    private func doneButtonTapped() {
+        delegate?.updateSchedule(weekSchedule: self.weekSchedule)
+        dismiss(animated: true)
+    }
 }
 
 // MARK: - UITableViewDataSource
@@ -95,7 +95,7 @@ extension ScheduleViewController: UITableViewDataSource {
         cell.delegate = self
         let cellName = weekSchedule.daysOfWeek[indexPath.row].name
         let cellAdditionalUIElement = CellElement.daySelectionSwitch
-        cell.configurate(nameLabel: cellName, element: cellAdditionalUIElement)
+        cell.configCell(nameLabel: cellName, element: cellAdditionalUIElement)
         return cell
     }
 }

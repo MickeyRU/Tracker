@@ -10,16 +10,12 @@ import UIKit
 final class TrackersViewController: UIViewController {
     // Категории для работы с логикой добавления / удаления трекеров
     private var categories = [TrackerCategory]()
-    
     // Категории для отображения в UI
     private var visibleCategories = [TrackerCategory]()
-    
     // Выполненные трекеры
     private var completedTrackers: Set<TrackerRecord> = []
-    
     // Текущая дата
     private var currentDate: Date
-    
     // Параметры для настройки размеров коллекции
     private var params = GeometricParams(cellCount: 2, leftInset: 16, rightInset: 16, cellSpacing: 9)
     
@@ -36,7 +32,6 @@ final class TrackersViewController: UIViewController {
     private let searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
         textField.placeholder = "Поиск"
-        textField.addTarget(self, action: #selector(searchTextFieldValueChanged), for: .editingChanged)
         return textField
     }()
     
@@ -70,9 +65,10 @@ final class TrackersViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        currentDate = Date()
         
+        currentDate = Date()
         view.backgroundColor = .white
+        searchTextField.delegate = self
         
         setupNavigationBar()
         setupCollectionView()
@@ -80,11 +76,6 @@ final class TrackersViewController: UIViewController {
         checkingVisibleTrackersCount()
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleNewTrackerNotification(_:)), name: Notification.Name("NewTrackerNotification"), object: nil)
-    }
-    
-    @objc
-    private func sortTrackersByChosenDayOfWeek() {
-        sortTrackersForChosenDay()
     }
     
     private func sortTrackersForChosenDay() {
@@ -100,8 +91,8 @@ final class TrackersViewController: UIViewController {
                 return tracker.schedule.daysOfWeek[weekDay].isCompleted
             }
             guard !selectedTrackers.isEmpty else {
-                    return nil // Возвращаем пустую категорию
-                }
+                return nil // Возвращаем пустую категорию
+            }
             return TrackerCategory(name: category.name, trackers: selectedTrackers)
         }
         
@@ -110,17 +101,6 @@ final class TrackersViewController: UIViewController {
         // Обновляем коллекцию для отображения трекеров
         trackersCollectionView.reloadData()
         checkingVisibleTrackersCount()
-    }
-    
-    @objc
-    private func searchTextFieldValueChanged() {
-        // Получаем текст из UISearchTextField
-        guard let searchText = searchTextField.text else { return }
-        if searchText.isEmpty {
-            self.sortTrackersForChosenDay()
-        } else {
-            filterTrackersBySearchText(searchText)
-        }
     }
     
     private func filterTrackersBySearchText(_ searchText: String) {
@@ -134,8 +114,8 @@ final class TrackersViewController: UIViewController {
                 return isNameMatch && isDayOfWeekMatch
             }
             guard !selectedTrackers.isEmpty else {
-                    return nil // Возвращаем пустую категорию
-                }
+                return nil // Возвращаем пустую категорию
+            }
             return TrackerCategory(name: category.name, trackers: selectedTrackers)
         }
         visibleCategories = matchingCategories
@@ -154,6 +134,67 @@ final class TrackersViewController: UIViewController {
             weekDay -= 1
         }
         return weekDay
+    }
+    
+    private func setupNavigationBar() {
+        // Установка заголовка
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.title = "Трекеры"
+        
+        // Создание UIBarButtonItem с кнопкой "+"
+        let addButton = UIBarButtonItem(image: Images.addTrackerButtonImage, style: .plain, target: self, action: #selector(addButtonTapped))
+        addButton.tintColor = .black
+        navigationItem.leftBarButtonItem = addButton
+        
+        // Создание UIBarButtonItem с UIDatePicker в качестве кастомного представления
+        let datePickerBarButton = UIBarButtonItem(customView: datePicker)
+        navigationItem.rightBarButtonItem = datePickerBarButton
+        
+    }
+    
+    private func setupViews() {
+        [searchTextField, trackersCollectionView].forEach { view.addViewsWithNoTAMIC($0) }
+        
+        NSLayoutConstraint.activate([
+            searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            searchTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            searchTextField.heightAnchor.constraint(equalToConstant: 36),
+            searchTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            trackersCollectionView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 10),
+            trackersCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            trackersCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            trackersCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        ])
+    }
+    
+    private func setupCollectionView() {
+        trackersCollectionView.delegate = self
+        trackersCollectionView.dataSource = self
+        
+        trackersCollectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
+        trackersCollectionView.register(SupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
+    }
+    
+    private func checkingVisibleTrackersCount() {
+        if visibleCategories.isEmpty {
+            [emptyOnScreenLabel, emptyOnScreenImage].forEach { view.addViewsWithNoTAMIC($0) }
+            
+            NSLayoutConstraint.activate([
+                
+                emptyOnScreenImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                emptyOnScreenImage.centerYAnchor.constraint(equalTo: trackersCollectionView.centerYAnchor),
+                emptyOnScreenImage.widthAnchor.constraint(equalToConstant: 80),
+                emptyOnScreenImage.heightAnchor.constraint(equalToConstant: 80),
+                
+                emptyOnScreenLabel.topAnchor.constraint(equalTo: emptyOnScreenImage.bottomAnchor, constant: 8),
+                emptyOnScreenLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+                emptyOnScreenLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+            ])
+        } else {
+            [emptyOnScreenLabel, emptyOnScreenImage].forEach { $0.removeFromSuperview()
+            }
+        }
     }
     
     @objc
@@ -189,24 +230,14 @@ final class TrackersViewController: UIViewController {
                     print("Трекер создан на день отличный от текущего ")
                 }
                 self.visibleCategories = self.categories
+                checkingVisibleTrackersCount()
             }
         }
     }
     
-    private func setupNavigationBar() {
-        // Установка заголовка
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.title = "Трекеры"
-        
-        // Создание UIBarButtonItem с кнопкой "+"
-        let addButton = UIBarButtonItem(image: Images.addTrackerButtonImage, style: .plain, target: self, action: #selector(addButtonTapped))
-        addButton.tintColor = .black
-        navigationItem.leftBarButtonItem = addButton
-        
-        // Создание UIBarButtonItem с UIDatePicker в качестве кастомного представления
-        let datePickerBarButton = UIBarButtonItem(customView: datePicker)
-        navigationItem.rightBarButtonItem = datePickerBarButton
-        
+    @objc
+    private func sortTrackersByChosenDayOfWeek() {
+        sortTrackersForChosenDay()
     }
     
     @objc
@@ -215,50 +246,6 @@ final class TrackersViewController: UIViewController {
         let destinationViewController = ChooseTrackerTypeViewController()
         destinationViewController.modalPresentationStyle = .formSheet
         present(destinationViewController, animated: true)
-    }
-    
-    private func setupViews() {
-        [searchTextField, trackersCollectionView].forEach { view.addViewsWithNoTAMIC($0) }
-        
-        NSLayoutConstraint.activate([
-            searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            searchTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            searchTextField.heightAnchor.constraint(equalToConstant: 36),
-            searchTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            
-            trackersCollectionView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 10),
-            trackersCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            trackersCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            trackersCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-        ])
-    }
-    
-    private func setupCollectionView() {
-        trackersCollectionView.delegate = self
-        trackersCollectionView.dataSource = self
-        
-        trackersCollectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
-        trackersCollectionView.register(SupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
-    }
-    
-    private func checkingVisibleTrackersCount() {
-        if visibleCategories.isEmpty {
-            [emptyOnScreenLabel, emptyOnScreenImage].forEach { view.addViewsWithNoTAMIC($0) }
-            
-            NSLayoutConstraint.activate([
-
-                emptyOnScreenImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                emptyOnScreenImage.centerYAnchor.constraint(equalTo: trackersCollectionView.centerYAnchor),
-                emptyOnScreenImage.widthAnchor.constraint(equalToConstant: 80),
-                emptyOnScreenImage.heightAnchor.constraint(equalToConstant: 80),
-                
-                emptyOnScreenLabel.topAnchor.constraint(equalTo: emptyOnScreenImage.bottomAnchor, constant: 8),
-                emptyOnScreenLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-                emptyOnScreenLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
-            ])
-        } else {
-            [emptyOnScreenLabel, emptyOnScreenImage].forEach { $0.removeFromSuperview() }
-        }
     }
 }
 
@@ -339,7 +326,6 @@ extension TrackersViewController: DaysCountProtocol {
         } else {
             print("Вы пытаетесь отметить трекер выполненным в дату, которая еще не наступила")
         }
-        
     }
     
     private func addTrackerRecord(tracker: Tracker) {
@@ -350,5 +336,25 @@ extension TrackersViewController: DaysCountProtocol {
     private func removeTrackerRecord(tracker: Tracker) {
         let trackerRecord = TrackerRecord(trackerID: tracker.id, date: currentDate)
         completedTrackers.remove(trackerRecord)
+    }
+}
+
+extension TrackersViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let currentText = textField.text ?? ""
+        let updatedText = (currentText as NSString).replacingCharacters(in: range, with: string)
+        
+        if updatedText.isEmpty {
+            // Если новый текст пустой, применить логику фильтрации для пустого значения
+            self.sortTrackersForChosenDay()
+        } else {
+            filterTrackersBySearchText(updatedText)
+        }
+        return true
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
