@@ -7,14 +7,15 @@
 
 import UIKit
 
-protocol ScheduleProtocol: AnyObject {
-    func updateSchedule(weekSchedule: WeekSchedule)
+protocol ScheduleProtocolDelegate: AnyObject {
+    func saveSchedule(weekSchedule: [WeekDay]?)
 }
 
 final class ScheduleViewController: UIViewController {
-    weak var delegate: ScheduleProtocol?
+    weak var delegate: ScheduleProtocolDelegate?
     
-    private var weekSchedule = WeekSchedule()
+    private let weekDays = WeekDay.allCases
+    private var weekSchedule: [WeekDay] = []
     
     private var pageTitle: UILabel = {
         let label = UILabel()
@@ -47,7 +48,7 @@ final class ScheduleViewController: UIViewController {
         setupViews()
         setupTableView()
     }
-        
+    
     private func setupViews() {
         [pageTitle, daysOfWeekTableView, doneButton].forEach { view.addViewsWithNoTAMIC($0) }
         
@@ -58,7 +59,7 @@ final class ScheduleViewController: UIViewController {
             daysOfWeekTableView.topAnchor.constraint(equalTo: pageTitle.bottomAnchor, constant: 38),
             daysOfWeekTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             daysOfWeekTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            daysOfWeekTableView.heightAnchor.constraint(equalToConstant: CGFloat(weekSchedule.daysOfWeek.count * 75)),
+            daysOfWeekTableView.heightAnchor.constraint(equalToConstant: CGFloat(weekDays.count * 75)),
             
             doneButton.heightAnchor.constraint(equalToConstant: 60),
             doneButton.leadingAnchor.constraint(equalTo: daysOfWeekTableView.leadingAnchor),
@@ -76,7 +77,7 @@ final class ScheduleViewController: UIViewController {
     
     @objc
     private func doneButtonTapped() {
-        delegate?.updateSchedule(weekSchedule: self.weekSchedule)
+        delegate?.saveSchedule(weekSchedule: self.weekSchedule)
         dismiss(animated: true)
     }
 }
@@ -85,7 +86,7 @@ final class ScheduleViewController: UIViewController {
 
 extension ScheduleViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        weekSchedule.daysOfWeek.count
+        return weekDays.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -93,9 +94,12 @@ extension ScheduleViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         cell.delegate = self
-        let cellName = weekSchedule.daysOfWeek[indexPath.row].name
+        
+        let adjustedIndex = (indexPath.row + 1) % weekDays.count // Вычисляем индекс с учетом сдвига
+        
+        let cellName = weekDays[adjustedIndex]
         let cellAdditionalUIElement = CellElement.daySelectionSwitch
-        cell.configCell(nameLabel: cellName, element: cellAdditionalUIElement)
+        cell.configCell(nameLabel: cellName.dayName, element: cellAdditionalUIElement, indexPath: indexPath)
         return cell
     }
 }
@@ -113,11 +117,16 @@ extension ScheduleViewController: UITableViewDelegate {
 }
 
 extension ScheduleViewController: SwitcherProtocolDelegate {
-    func receiveSwitcherValue(at cell: CreateTrackerCell, isSelected: Bool) {
-        // Получаем индекс ячейки
-        guard let indexPath = daysOfWeekTableView.indexPath(for: cell) else {
-            return
+    func receiveSwitcherValue(isSelected: Bool, indexPath: IndexPath) {
+        let adjustedIndex = (indexPath.row + 1) % weekDays.count // Применяем сдвиг индекса
+        
+        let weekElement = weekDays[adjustedIndex]
+        if isSelected {
+            weekSchedule.append(weekElement)
+        } else {
+            if let index = weekSchedule.firstIndex(of: weekElement) {
+                weekSchedule.remove(at: index)
+            }
         }
-        weekSchedule.daysOfWeek[indexPath.row].isCompleted = isSelected
     }
 }

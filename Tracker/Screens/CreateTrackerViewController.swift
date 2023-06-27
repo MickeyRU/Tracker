@@ -9,7 +9,8 @@ import UIKit
 
 final class CreateTrackerViewController: UIViewController {
     private var trackerOptions: [String] = [] // Опции для отображение в UI, доступные пользователю для выбранного типа трекера (Например расписание)
-    private var weekSchedule = WeekSchedule() // Экземпляр модели дни недели для хранения расписания в случае если трекер - привычка
+    
+    private var weekSchedule = [WeekDay]()
     
     private var pageTitle: UILabel = {
         let label = UILabel()
@@ -19,11 +20,12 @@ final class CreateTrackerViewController: UIViewController {
         return label
     }()
     
-    private let trackerNameTextField: UITextField = {
+    private lazy var trackerNameTextField: UITextField = {
         let textField = UITextField()
         textField.backgroundColor = UIColor(red: 0.9, green: 0.91, blue: 0.92, alpha: 0.3)
         textField.placeholder = "Введите название трекера"
         textField.layer.cornerRadius = 16
+        textField.delegate = self
         
         // Создаем отступ, для текста в плейсхолдере
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: textField.frame.height))
@@ -125,21 +127,27 @@ final class CreateTrackerViewController: UIViewController {
     private func createButtonTapped() {
         // При нажатии на кнопку у нас создается категория выбранная пользователем и трекер
         // ToDo: доработать функционал позже, пока статичная категория
-        let category = TrackerCategory(name: "Учимся кодить", trackers: [])
+        let category = TrackerCategory(name: "Создаем новые категории", trackers: [])
+
+        let trackerName = trackerNameTextField.text ?? ""
         
-        // ToDo: - Добавить функционал нейминга нового трекера в соотвествии с тем, что ввел пользователь в текстфилде.
-        let trackerName = "Тестовый трекер"
-        
+        var scheduleForNewTracker = [WeekDay]()
+        if weekSchedule.count > 0 {
+            scheduleForNewTracker = weekSchedule
+        } else {
+            scheduleForNewTracker = [.monday, .tuesday, .wednesday, .thursday, .friday , .saturday, .sunday] // Для неругярного трекера - доступны все дни недели
+        }
+
         let newTracker = Tracker(name: trackerName,
                                  color: UIColor.randomColor, // ToDo: - Пока рандом - дальше переделать на выбранное пользователем.
                                  emoji: "🔥", // ToDo: - Пока сам указал - дальше переделать на выбранное пользователем.
-                                 schedule: weekSchedule)
+                                 schedule: scheduleForNewTracker)
         // Собираем словарь для передачи через нотификацию на главный экран
         let userInfo: [String: Any] = [
             "Category": category,
             "NewTracker": newTracker,
         ]
-        
+
         NotificationCenter.default.post(name: NSNotification.Name("NewTrackerNotification"), object: nil, userInfo: userInfo)
         self.presentingViewController?.presentingViewController?.dismiss(animated: true)
     }
@@ -158,7 +166,7 @@ extension CreateTrackerViewController: UITableViewDataSource {
         }
         let cellName = trackerOptions[indexPath.row]
         let cellAdditionalUIElement = CellElement.arrowImageView
-        cell.configCell(nameLabel: cellName, element: cellAdditionalUIElement)
+        cell.configCell(nameLabel: cellName, element: cellAdditionalUIElement, indexPath: indexPath)
         return cell
     }
 }
@@ -188,9 +196,16 @@ extension CreateTrackerViewController: UITableViewDelegate {
     }
 }
 
+extension CreateTrackerViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+}
 
-extension CreateTrackerViewController: ScheduleProtocol {
-    func updateSchedule(weekSchedule: WeekSchedule) {
+extension CreateTrackerViewController: ScheduleProtocolDelegate {
+    func saveSchedule(weekSchedule: [WeekDay]?) {
+        guard let weekSchedule = weekSchedule else { return }
         self.weekSchedule = weekSchedule
     }
 }

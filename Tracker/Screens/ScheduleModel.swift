@@ -11,15 +11,3 @@ struct DaysOfWeek {
     let name: String
     var isCompleted: Bool
 }
-
-struct WeekSchedule {
-    var daysOfWeek = [
-        DaysOfWeek(name: "Понедельник", isCompleted: false),
-        DaysOfWeek(name: "Вторник", isCompleted: false),
-        DaysOfWeek(name: "Среда", isCompleted: false),
-        DaysOfWeek(name: "Четверг", isCompleted: false),
-        DaysOfWeek(name: "Пятница", isCompleted: false),
-        DaysOfWeek(name: "Суббота", isCompleted: false),
-        DaysOfWeek(name: "Воскресенье", isCompleted: false),
-    ]
-}

@@ -7,17 +7,19 @@
 
 import UIKit
 
-protocol DaysCountProtocol: AnyObject {
-    func changeDaysCount(at cell: TrackerCell, isDayCountIncreased: Bool, tracker: Tracker)
+protocol TrackerCellDelegate: AnyObject {
+    func completeTracker(id: UUID, at indexPath: IndexPath)
+    func uncompleteTracker(id: UUID, at indexPath: IndexPath)
 }
 
 final class TrackerCell: UICollectionViewCell {
     static let reuseIdentifier = "TrackerCell"
     
-    weak var delegate: DaysCountProtocol?
+    private var trackerId: UUID?
+    private var indexPath: IndexPath?
+    weak var delegate: TrackerCellDelegate?
 
-    private var tracker: Tracker?
-    private var isAddDaysButtonTapped = false
+    private var isCompletedToday: Bool = false
     
     private var backGroundViewColor: UIView = {
         let view = UIView()
@@ -46,9 +48,9 @@ final class TrackerCell: UICollectionViewCell {
         return label
     }()
     
-    private var addDaysButton: UIButton = {
+    private var trackButton: UIButton = {
         let button = UIButton()
-        button.addTarget(self, action: #selector(addDaysButtonTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(trackButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -61,31 +63,29 @@ final class TrackerCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configCell(tracker: Tracker, trackerRecordsCount: Int, isButtonTapped: Bool) {
-        isAddDaysButtonTapped = isButtonTapped
-        self.tracker = tracker
+    func configCell(tracker: Tracker, isCompletedToday: Bool,  indexPath: IndexPath, completedDays: Int) {
+        self.trackerId = tracker.id
+        self.isCompletedToday = isCompletedToday
+        self.indexPath = indexPath
+        
         self.emojiLabel.text = tracker.emoji
         self.trackerTextLabel.text = tracker.name
         self.backGroundViewColor.backgroundColor = tracker.color
-        self.addDaysButton.tintColor = tracker.color
-        
-        updateDayCountLabelAndButton(count: trackerRecordsCount)
+        self.trackButton.tintColor = tracker.color
+        updateDayCountLabelAndButton(completedDays: completedDays)
     }
     
-    func updateDayCountLabelAndButton(count: Int) {
+    func updateDayCountLabelAndButton(completedDays: Int) {
         // Формируем итоговый лейбл с учетом склонения слова "день"
-        let formattedLabel = formatDayLabel(daysCount: count)
+        let formattedLabel = formatDayLabel(daysCount: completedDays)
         self.completedDaysLabel.text = formattedLabel
         
-        if isAddDaysButtonTapped {
-            self.addDaysButton.setImage(Images.addDaysButtonClickedImage, for: .normal)
-        } else {
-            self.addDaysButton.setImage(Images.addDaysButtonImage, for: .normal)
-        }
+        let image = isCompletedToday ? Images.addDaysButtonClickedImage : Images.addDaysButtonImage
+          trackButton.setImage(image, for: .normal)
     }
     
     private func setupViews() {
-        [backGroundViewColor, emojiLabel, trackerTextLabel, addDaysButton, completedDaysLabel].forEach { contentView.addViewsWithNoTAMIC($0) }
+        [backGroundViewColor, emojiLabel, trackerTextLabel, trackButton, completedDaysLabel].forEach { contentView.addViewsWithNoTAMIC($0) }
         
         NSLayoutConstraint.activate([
             backGroundViewColor.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -102,14 +102,14 @@ final class TrackerCell: UICollectionViewCell {
             trackerTextLabel.bottomAnchor.constraint(equalTo: backGroundViewColor.bottomAnchor, constant: -12),
             trackerTextLabel.trailingAnchor.constraint(equalTo: backGroundViewColor.trailingAnchor, constant: -12),
             
-            addDaysButton.widthAnchor.constraint(equalToConstant: 34),
-            addDaysButton.heightAnchor.constraint(equalToConstant: 34),
-            addDaysButton.topAnchor.constraint(equalTo: backGroundViewColor.bottomAnchor, constant: 8),
-            addDaysButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            trackButton.widthAnchor.constraint(equalToConstant: 34),
+            trackButton.heightAnchor.constraint(equalToConstant: 34),
+            trackButton.topAnchor.constraint(equalTo: backGroundViewColor.bottomAnchor, constant: 8),
+            trackButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
             
             completedDaysLabel.topAnchor.constraint(equalTo: backGroundViewColor.bottomAnchor, constant: 16),
             completedDaysLabel.leadingAnchor.constraint(equalTo: trackerTextLabel.leadingAnchor),
-            completedDaysLabel.trailingAnchor.constraint(equalTo: addDaysButton.leadingAnchor, constant: -8)
+            completedDaysLabel.trailingAnchor.constraint(equalTo: trackButton.leadingAnchor, constant: -8)
         ])
     }
     
@@ -130,9 +130,15 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     @objc
-    private func addDaysButtonTapped() {
-        isAddDaysButtonTapped = !isAddDaysButtonTapped
-        guard let tracker = tracker else { return }
-        delegate?.changeDaysCount(at: self, isDayCountIncreased: isAddDaysButtonTapped, tracker: tracker)
+    private func trackButtonTapped() {
+        guard let trackerId = trackerId , let indexPath = indexPath else {
+            assertionFailure("no tracker id")
+            return
+        }
+        if isCompletedToday {
+            delegate?.uncompleteTracker(id: trackerId, at: indexPath)
+        } else {
+            delegate?.completeTracker(id: trackerId, at: indexPath)
+        }
     }
 }

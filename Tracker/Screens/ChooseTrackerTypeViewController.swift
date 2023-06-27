@@ -45,12 +45,12 @@ final class ChooseTrackerTypeViewController: UIViewController {
         setupViews()
     }
     
-    private func presentTrackerDetailsViewController(trackerName: String, category: [String]) {
-        let trackerDetailsViewController = CreateTrackerViewController()
-        trackerDetailsViewController.modalPresentationStyle = .formSheet
+    private func presentCreateViewController(trackerName: String, category: [String]) {
+        let createTrackerViewController = CreateTrackerViewController()
+        createTrackerViewController.modalPresentationStyle = .formSheet
         let optionsArray = category
-        trackerDetailsViewController.configTitleAndOptions(trackerName, optionsArray)
-        present(trackerDetailsViewController, animated: true)
+        createTrackerViewController.configTitleAndOptions(trackerName, optionsArray)
+        present(createTrackerViewController, animated: true)
     }
 
     private func setupViews() {
@@ -74,11 +74,11 @@ final class ChooseTrackerTypeViewController: UIViewController {
     
     @objc
     private func habitButtonDidTapped() {
-        presentTrackerDetailsViewController(trackerName: "Новая привычка", category: ["Категория", "Расписание"])
+        presentCreateViewController(trackerName: "Новая привычка", category: ["Категория", "Расписание"])
     }
     
     @objc
     private func irregularEvenButtonDidTapped() {
-        presentTrackerDetailsViewController(trackerName: "Новое нерегулярное событие", category: ["Категория"])
+        presentCreateViewController(trackerName: "Новое нерегулярное событие", category: ["Категория"])
     }
 }

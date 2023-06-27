@@ -8,7 +8,7 @@
 import UIKit
 
 protocol SwitcherProtocolDelegate: AnyObject {
-    func receiveSwitcherValue(at cell: CreateTrackerCell, isSelected: Bool)
+    func receiveSwitcherValue(isSelected: Bool, indexPath: IndexPath)
 }
 
 enum CellElement {
@@ -22,6 +22,7 @@ final class CreateTrackerCell: UITableViewCell {
     weak var delegate: SwitcherProtocolDelegate?
     
     private var isSwitchSelected = false
+    private var indexPath: IndexPath?
     
     private var arrowImageView: UIImageView?
     private var daySelectionSwitch: UISwitch?
@@ -42,8 +43,9 @@ final class CreateTrackerCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configCell(nameLabel: String, element: CellElement) {
+    func configCell(nameLabel: String, element: CellElement, indexPath: IndexPath) {
         self.cellNameLabel.text = nameLabel
+        self.indexPath = indexPath
         
         // В зависимости от входного элемента настраиваем нужный UI элемент для экрана.
         switch element {
@@ -85,6 +87,10 @@ final class CreateTrackerCell: UITableViewCell {
     @objc
     private func switchValueDidChanged() {
         isSwitchSelected = !isSwitchSelected
-        delegate?.receiveSwitcherValue(at: self, isSelected: isSwitchSelected)
+        guard let indexPath = indexPath else {
+            assertionFailure("Ошибка получения индекса ячейки дня неделя со свитчером")
+            return
+        }
+        delegate?.receiveSwitcherValue(isSelected: isSwitchSelected, indexPath: indexPath)
     }
 }
