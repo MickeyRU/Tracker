@@ -30,7 +30,7 @@ final class ScheduleViewController: UIViewController {
         return tableView
     }()
     
-    private let doneButton: UIButton = {
+    private lazy var doneButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .black
         button.setTitle("Готово", for: .normal)
@@ -43,7 +43,7 @@ final class ScheduleViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         view.backgroundColor = .white
         setupViews()
         setupTableView()

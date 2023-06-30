@@ -39,7 +39,7 @@ final class CreateTrackerViewController: UIViewController {
         return tableView
     }()
     
-    private let cancelButton: UIButton = {
+    private lazy var cancelButton: UIButton = {
         let button = UIButton()
         button.setTitle("Отменить", for: .normal)
         button.setTitleColor(UIColor(red: 0.96, green: 0.42, blue: 0.42, alpha: 1.0), for: .normal)
@@ -51,7 +51,7 @@ final class CreateTrackerViewController: UIViewController {
         return button
     }()
     
-    private let createButton: UIButton = {
+    private lazy var createButton: UIButton = {
         let button = UIButton()
         button.setTitle("Создать", for: .normal)
         button.setTitleColor(.white, for: .normal)

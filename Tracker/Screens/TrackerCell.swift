@@ -48,7 +48,7 @@ final class TrackerCell: UICollectionViewCell {
         return label
     }()
     
-    private var trackButton: UIButton = {
+    private lazy var trackButton: UIButton = {
         let button = UIButton()
         button.addTarget(self, action: #selector(trackButtonTapped), for: .touchUpInside)
         return button
