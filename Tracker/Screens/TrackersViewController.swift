@@ -121,7 +121,7 @@ final class TrackersViewController: UIViewController {
         trackersCollectionView.dataSource = self
         
         trackersCollectionView.register(TrackerCell.self, forCellWithReuseIdentifier: TrackerCell.reuseIdentifier)
-        trackersCollectionView.register(SupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
+        trackersCollectionView.register(HeaderMainScreenView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
     }
     
     private func reloadVisibleCategories(text: String?, date: Date) {
@@ -247,7 +247,7 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! SupplementaryView
+        let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! HeaderMainScreenView
         let category = visibleCategories[indexPath.section]
         headerView.titleLabel.text = category.name
         return headerView

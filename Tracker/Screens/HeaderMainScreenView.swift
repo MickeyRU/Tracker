@@ -1,5 +1,5 @@
 //
-//  SupplementaryView.swift
+//  HeaderMainScreenView.swift
 //  Tracker
 //
 //  Created by Павел Афанасьев on 18.06.2023.
@@ -8,7 +8,7 @@
 import UIKit
 
 // Хедер для главной страницы
-final class SupplementaryView: UICollectionReusableView {
+final class HeaderMainScreenView: UICollectionReusableView {
     let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 19, weight: .bold)
