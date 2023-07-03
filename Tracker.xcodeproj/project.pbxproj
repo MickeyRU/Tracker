@@ -12,6 +12,8 @@
 		BE00EE112A4ADB3D00599D28 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE00EE102A4ADB3D00599D28 /* PlaceholderView.swift */; };
 		BE0780962A4F671000817E71 /* EmojiCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0780952A4F671000817E71 /* EmojiCell.swift */; };
 		BE0780982A506FA600817E71 /* HeaderViewForEmojiAndColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0780972A506FA600817E71 /* HeaderViewForEmojiAndColor.swift */; };
+		BE07809A2A50A39A00817E71 /* ColorsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0780992A50A39A00817E71 /* ColorsHelper.swift */; };
+		BE07809C2A50A9AE00817E71 /* ColorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE07809B2A50A9AE00817E71 /* ColorCell.swift */; };
 		BE1E62B12A3F2434002185B2 /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1E62B02A3F2434002185B2 /* StatisticsViewController.swift */; };
 		BE1E62B32A3F246D002185B2 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1E62B22A3F246D002185B2 /* MainTabBarController.swift */; };
 		BE1E62B52A3F4BE9002185B2 /* UIView + Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1E62B42A3F4BE9002185B2 /* UIView + Extensions.swift */; };
@@ -38,6 +40,8 @@
 		BE00EE102A4ADB3D00599D28 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		BE0780952A4F671000817E71 /* EmojiCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiCell.swift; sourceTree = "<group>"; };
 		BE0780972A506FA600817E71 /* HeaderViewForEmojiAndColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderViewForEmojiAndColor.swift; sourceTree = "<group>"; };
+		BE0780992A50A39A00817E71 /* ColorsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorsHelper.swift; sourceTree = "<group>"; };
+		BE07809B2A50A9AE00817E71 /* ColorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCell.swift; sourceTree = "<group>"; };
 		BE1E62B02A3F2434002185B2 /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		BE1E62B22A3F246D002185B2 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		BE1E62B42A3F4BE9002185B2 /* UIView + Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView + Extensions.swift"; sourceTree = "<group>"; };
@@ -191,6 +195,7 @@
 				BE1E62B92A3F4EB2002185B2 /* TrackerCell.swift */,
 				BEEE7C4F2A40580400315F2D /* CreateTrackerCell.swift */,
 				BE0780952A4F671000817E71 /* EmojiCell.swift */,
+				BE07809B2A50A9AE00817E71 /* ColorCell.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -211,6 +216,7 @@
 			children = (
 				BEEE7C5C2A41CA0200315F2D /* SeparatorLineHelper.swift */,
 				BE00EE0E2A4A15C400599D28 /* DataManager.swift */,
+				BE0780992A50A39A00817E71 /* ColorsHelper.swift */,
 			);
 			name = Helpers;
 			path = Screens;
@@ -295,9 +301,11 @@
 				BE1E62C22A3F8B44002185B2 /* GeometricParams.swift in Sources */,
 				BE1E62B32A3F246D002185B2 /* MainTabBarController.swift in Sources */,
 				BEEE7C522A40C98400315F2D /* UIColor + Extensions.swift in Sources */,
+				BE07809C2A50A9AE00817E71 /* ColorCell.swift in Sources */,
 				BE1E62BC2A3F842C002185B2 /* HeaderMainScreenView.swift in Sources */,
 				BE00BEF62A3F201F008FC172 /* Images.swift in Sources */,
 				BE638BBF2A3C7D58005900C2 /* AppDelegate.swift in Sources */,
+				BE07809A2A50A39A00817E71 /* ColorsHelper.swift in Sources */,
 				BEEE7C502A40580400315F2D /* CreateTrackerCell.swift in Sources */,
 				BE00EE112A4ADB3D00599D28 /* PlaceholderView.swift in Sources */,
 				BE1E62BE2A3F89F8002185B2 /* TrackerModels.swift in Sources */,

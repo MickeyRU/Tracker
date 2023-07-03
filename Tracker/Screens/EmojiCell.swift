@@ -8,9 +8,9 @@
 import UIKit
 
 final class EmojiCell: UICollectionViewCell {
-    static let reuseIdentifier = "EmojiAndColorCell"
+    static let reuseIdentifier = "EmojiCell"
     
-    private lazy var emojiTextLabel: UILabel = {
+    private var emojiTextLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 31)
         return label
@@ -29,8 +29,10 @@ final class EmojiCell: UICollectionViewCell {
         contentView.addViewsWithNoTAMIC(emojiTextLabel)
         
         NSLayoutConstraint.activate([
-            emojiTextLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            emojiTextLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            emojiTextLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            emojiTextLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 7),
+            emojiTextLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -7),
+            emojiTextLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10)
         ])
     }
     

@@ -20,9 +20,9 @@ final class HeaderViewForEmojiAndColor: UICollectionReusableView {
         addViewsWithNoTAMIC(titleLabel)
         
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant:  16),
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant:  28),
             titleLabel.topAnchor.constraint(equalTo: topAnchor),
-            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24)
+            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
     
