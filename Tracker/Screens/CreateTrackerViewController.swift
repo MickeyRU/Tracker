@@ -1,5 +1,5 @@
 //
-//  TrackerDetailsViewController.swift
+//  CreateTrackerViewController.swift
 //  Tracker
 //
 //  Created by Павел Афанасьев on 19.06.2023.
@@ -14,6 +14,9 @@ final class CreateTrackerViewController: UIViewController {
     
     private let emojiArray = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪"]
     private let colorsArray = ColorsHelper.shared.GenerateColors()
+    
+    private var selectedEmoji: [Int: String] = [:]
+    private var selectedColor: [Int: UIColor] = [:]
     
     private let screenScrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -104,25 +107,25 @@ final class CreateTrackerViewController: UIViewController {
             screenScrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             screenScrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             screenScrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-
+            
             pageTitle.centerXAnchor.constraint(equalTo: screenScrollView.centerXAnchor),
             pageTitle.topAnchor.constraint(equalTo: screenScrollView.topAnchor, constant: 27),
-
+            
             trackerNameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             trackerNameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             trackerNameTextField.heightAnchor.constraint(equalToConstant: 75),
             trackerNameTextField.topAnchor.constraint(equalTo: pageTitle.bottomAnchor, constant: 38),
-
+            
             trackerOptionsTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
             trackerOptionsTableView.leadingAnchor.constraint(equalTo: trackerNameTextField.leadingAnchor),
             trackerOptionsTableView.trailingAnchor.constraint(equalTo: trackerNameTextField.trailingAnchor),
             trackerOptionsTableView.heightAnchor.constraint(equalToConstant: CGFloat(trackerOptions.count * 75)),
-
+            
             emojiAndColorsCollectionView.topAnchor.constraint(equalTo: trackerOptionsTableView.bottomAnchor, constant: 32),
             emojiAndColorsCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             emojiAndColorsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             emojiAndColorsCollectionView.heightAnchor.constraint(equalToConstant: 470),
-
+            
             buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             buttonStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             buttonStackView.topAnchor.constraint(equalTo: emojiAndColorsCollectionView.bottomAnchor, constant: 16),
@@ -174,9 +177,20 @@ final class CreateTrackerViewController: UIViewController {
             scheduleForNewTracker = [.monday, .tuesday, .wednesday, .thursday, .friday , .saturday, .sunday] // Для неругярного трекера - доступны все дни недели
         }
         
+        var color: UIColor?
+        var emoji: String?
+        
+        if let selectedColorIndex = self.selectedColor.keys.first {
+            color = colorsArray[selectedColorIndex]
+        }
+        
+        if let selectedEmojiIndex = self.selectedEmoji.keys.first {
+            emoji = emojiArray[selectedEmojiIndex]
+        }
+        
         let newTracker = Tracker(name: trackerName,
-                                 color: UIColor.randomColor, // ToDo: - Пока рандом - дальше переделать на выбранное пользователем.
-                                 emoji: "🔥", // ToDo: - Пока сам указал - дальше переделать на выбранное пользователем.
+                                 color: color ?? UIColor.randomColor,
+                                 emoji: emoji ?? "🔥",
                                  schedule: scheduleForNewTracker)
         // Собираем словарь для передачи через нотификацию на главный экран
         let userInfo: [String: Any] = [
@@ -290,7 +304,7 @@ extension CreateTrackerViewController: UICollectionViewDataSource {
     }
 }
 
-// MARK: - UICollectionViewDelegate
+// MARK: - UICollectionViewDelegateFlowLayout
 
 extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -323,24 +337,53 @@ extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
         switch indexPath.section {
         case 0:
             guard let cell = collectionView.cellForItem(at: indexPath) as? EmojiCell else { return }
-            cell.emojiIsSelected(isSelected: true)
+            let emoji = emojiArray[indexPath.row]
+            
+            // Проверяем, является ли выбранная ячейка уже выбранной
+            if selectedEmoji[indexPath.row] != nil {
+                // Отменяем выбор
+                selectedEmoji.removeValue(forKey: indexPath.row)
+                cell.emojiIsSelected(isSelected: false)
+            } else {
+                // Проверяем, есть ли уже выбранное значение
+                if let oldChosenEmojiIndex = selectedEmoji.keys.first {
+                    // Удаляем предыдущее выбранное значение
+                    selectedEmoji.removeValue(forKey: oldChosenEmojiIndex)
+                    
+                    // Отменяем выделение у предыдущей ячейки
+                    if let oldChosenCell = collectionView.cellForItem(at: IndexPath(row: oldChosenEmojiIndex, section: indexPath.section)) as? EmojiCell {
+                        oldChosenCell.emojiIsSelected(isSelected: false)
+                    }
+                }
+                
+                // Добавляем новое выбранное значение в словарь
+                selectedEmoji[indexPath.row] = emoji
+                
+                // Выделяем ячейку
+                cell.emojiIsSelected(isSelected: true)
+            }
         case 1:
             guard let cell = collectionView.cellForItem(at: indexPath) as? ColorCell else { return }
-            cell.colorIsSelected(isSelected: true)
+            let color = colorsArray[indexPath.row]
+            
+            if selectedColor[indexPath.row] != nil {
+                selectedColor.removeValue(forKey: indexPath.row)
+                cell.colorIsSelected(isSelected: false)
+            } else {
+                if let oldChosenColorIndex = selectedColor.keys.first {
+                    selectedColor.removeValue(forKey: oldChosenColorIndex)
+                    
+                    if let oldChosenCell = collectionView.cellForItem(at: IndexPath(row: oldChosenColorIndex, section: indexPath.section)) as? ColorCell {
+                        oldChosenCell.colorIsSelected(isSelected: false)
+                    }
+                }
+                // Добавляем новое выбранное значение в словарь
+                selectedColor[indexPath.row] = color
+                
+                cell.colorIsSelected(isSelected: true)
+            }
         default:
             print("-------default---------\(indexPath.section)")
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        switch indexPath.section {
-        case 0: guard let cell = collectionView.cellForItem(at: indexPath) as? EmojiCell else { return }
-            cell.emojiIsSelected(isSelected: false)
-        case 1:
-            guard let cell = collectionView.cellForItem(at: indexPath) as? ColorCell else { return }
-            cell.colorIsSelected(isSelected: false)
-        default:
-            print("-------default----------\(indexPath.section)")
         }
     }
 }
