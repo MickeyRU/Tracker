@@ -15,13 +15,14 @@ final class DataManager {
             name: "Уборка",
             trackers: [
                 Tracker(
+                    id: UUID(),
                     name: "Помыть посуду",
                     color: UIColor.green,
                     emoji: "🥶",
                     schedule: [WeekDay.tuesday, WeekDay.sunday]
                 ),
                 Tracker(
-                    name: "Погладить одежду",
+                    id: UUID(),                    name: "Погладить одежду",
                     color: UIColor.blue,
                     emoji: "🤪",
                     schedule:[WeekDay.tuesday, WeekDay.friday]
@@ -32,12 +33,14 @@ final class DataManager {
             name: "Сделать уроки",
             trackers: [
                 Tracker(
+                    id: UUID(),
                     name: "География",
                     color: UIColor.green,
                     emoji: "😂",
                     schedule: [WeekDay.tuesday, WeekDay.sunday]
                 ),
                 Tracker(
+                    id: UUID(),
                     name: "Математика",
                     color: UIColor.blue,
                     emoji: "🥳",

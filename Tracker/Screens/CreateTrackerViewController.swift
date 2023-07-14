@@ -188,7 +188,8 @@ final class CreateTrackerViewController: UIViewController {
             emoji = emojiArray[selectedEmojiIndex]
         }
         
-        let newTracker = Tracker(name: trackerName,
+        let newTracker = Tracker(id: UUID(),
+                                 name: trackerName,
                                  color: color ?? UIColor.randomColor,
                                  emoji: emoji ?? "🔥",
                                  schedule: scheduleForNewTracker)
@@ -377,7 +378,7 @@ extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
                         oldChosenCell.colorIsSelected(isSelected: false)
                     }
                 }
-                // Добавляем новое выбранное значение в словарь
+
                 selectedColor[indexPath.row] = color
                 
                 cell.colorIsSelected(isSelected: true)
