@@ -8,6 +8,8 @@
 import UIKit
 
 final class TrackersViewController: UIViewController {
+    private var dataProvider: DataProviderProtocol
+    
     // Категории для работы с логикой добавления / удаления трекеров
     private var categories: [TrackerCategory] = []
     // Категории для отображения в UI
@@ -49,6 +51,9 @@ final class TrackersViewController: UIViewController {
     
     
     init() {
+        self.dataProvider = DataProvider(trackerStore: TrackerStore(),
+                                         trackerCategoryStore: TrackerCategoryStore(),
+                                         trackerRecordsStore: TrackerRecordStore())
         self.currentDate = Date()
         super.init(nibName: nil, bundle: nil)
     }
