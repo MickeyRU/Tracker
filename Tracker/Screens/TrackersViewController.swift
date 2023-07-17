@@ -8,7 +8,7 @@
 import UIKit
 
 final class TrackersViewController: UIViewController {
-    private var dataProvider: DataProviderProtocol
+    private var dataProvider: DataProviderProtocol!
     
     // Категории для работы с логикой добавления / удаления трекеров
     private var categories: [TrackerCategory] = []
@@ -17,10 +17,9 @@ final class TrackersViewController: UIViewController {
     // Выполненные трекеры
     private var completedTrackers: [TrackerRecord] = []
     // Текущая дата
-    private var currentDate: Date
+    private var currentDate: Date!
     // Параметры для настройки размеров коллекции
     private var params = GeometricParams(cellCount: 2, leftInset: 16, rightInset: 16, cellSpacing: 9)
-    private let dataManager = DataManager.shared
     
     private lazy var datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
@@ -48,23 +47,15 @@ final class TrackersViewController: UIViewController {
     private let placeholderView = PlaceholderView(
         title: "Что будем отслеживать?"
     )
-    
-    
-    init() {
-        self.dataProvider = DataProvider(trackerStore: TrackerStore(),
-                                         trackerCategoryStore: TrackerCategoryStore(),
-                                         trackerRecordsStore: TrackerRecordStore())
-        self.currentDate = Date()
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.dataProvider = DataProvider(trackerStore: TrackerStore(),
+                                         trackerCategoryStore: TrackerCategoryStore(),
+                                         trackerRecordsStore: TrackerRecordStore(),
+                                         delegate: self)
+        updateDate()
         reloadData()
         
         currentDate = Date()
@@ -77,13 +68,17 @@ final class TrackersViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(handleNewTrackerNotification(_:)), name: Notification.Name("NewTrackerNotification"), object: nil)
     }
     
-    private func reloadCurrentDate() {
+    private func updateDate() {
         self.currentDate = datePicker.date
     }
     
     private func reloadData() {
-        categories = dataManager.categories
-        dateChanged()
+        do {
+            try dataProvider.addFiltersForFetchResultController(searchText: "", date: currentDate)
+        } catch {
+            //TODO: show alert
+            print(error.localizedDescription)
+        }
     }
     
     private func setupNavigationBar() {
@@ -197,7 +192,7 @@ final class TrackersViewController: UIViewController {
                     let newCategory = TrackerCategory(name: category.name, trackers: [tracker])
                     self.categories.append(newCategory)
                 }
-                reloadCurrentDate()
+                updateDate()
                 reloadVisibleCategories(text: searchTextField.text, date: currentDate)
             }
         }
@@ -205,7 +200,7 @@ final class TrackersViewController: UIViewController {
     
     @objc
     private func dateChanged() {
-        reloadCurrentDate()
+        updateDate()
         reloadVisibleCategories(text: searchTextField.text, date: currentDate)
     }
     
@@ -222,12 +217,11 @@ final class TrackersViewController: UIViewController {
 
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        visibleCategories.count
+        dataProvider.numberOfSections
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let trackers = visibleCategories[section].trackers
-        return trackers.count
+        dataProvider.numberOfRowsInSection(section: section)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -236,9 +230,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         
         let cellData = visibleCategories
         let tracker = cellData[indexPath.section].trackers[indexPath.row]
-        
-        cell.delegate = self
-        
+                
         let isCompletedToday = isTrackerCompletedToday(id: tracker.id)
         let completedDays = completedTrackers.filter { $0.trackerID == tracker.id }.count
         cell.configCell(
@@ -247,7 +239,6 @@ extension TrackersViewController: UICollectionViewDataSource {
             indexPath: indexPath,
             completedDays: completedDays
         )
-        
         return cell
     }
     
@@ -260,7 +251,6 @@ extension TrackersViewController: UICollectionViewDataSource {
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
-
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: Int((collectionView.bounds.width - params.paddingWidth)) / params.cellCount, height: 148)
@@ -285,8 +275,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-// MARK: - DaysCountProtocol
-
+// MARK: - TrackerCellDelegate
 extension TrackersViewController: TrackerCellDelegate {
     func completeTracker(id: UUID, at indexPath: IndexPath) {
         let realDate = Date()
@@ -315,12 +304,19 @@ extension TrackersViewController: TrackerCellDelegate {
 }
 
 // MARK: - UITextFieldDelegate
-
 extension TrackersViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        reloadCurrentDate()
+        updateDate()
         reloadVisibleCategories(text: textField.text, date: currentDate)
         return true
+    }
+}
+
+// MARK: - DataProviderDelegate
+extension TrackersViewController: DataProviderDelegate {
+    func didChangeContent() {
+        // ToDo: Произошли изменения в контексте и тут нужен код для внесения изменения в UI по индексу изменений
+        trackersCollectionView.reloadData()
     }
 }

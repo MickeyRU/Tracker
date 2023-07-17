@@ -53,6 +53,10 @@ enum WeekDay: CaseIterable {
             return "Суббота"
         }
     }
+    
+    static func getWeekDayInNumber(for date: Date) -> String {
+        String(Calendar.current.component(.weekday, from: date))
+    }
 }
 
 

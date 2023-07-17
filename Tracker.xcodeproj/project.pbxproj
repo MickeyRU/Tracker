@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		BE00BEF62A3F201F008FC172 /* Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE00BEF52A3F201E008FC172 /* Images.swift */; };
-		BE00EE0F2A4A15C400599D28 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE00EE0E2A4A15C400599D28 /* DataManager.swift */; };
 		BE00EE112A4ADB3D00599D28 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE00EE102A4ADB3D00599D28 /* PlaceholderView.swift */; };
 		BE0780962A4F671000817E71 /* EmojiCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0780952A4F671000817E71 /* EmojiCell.swift */; };
 		BE0780982A506FA600817E71 /* HeaderViewForEmojiAndColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0780972A506FA600817E71 /* HeaderViewForEmojiAndColor.swift */; };
@@ -41,7 +40,6 @@
 
 /* Begin PBXFileReference section */
 		BE00BEF52A3F201E008FC172 /* Images.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Images.swift; sourceTree = "<group>"; };
-		BE00EE0E2A4A15C400599D28 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		BE00EE102A4ADB3D00599D28 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		BE0780952A4F671000817E71 /* EmojiCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiCell.swift; sourceTree = "<group>"; };
 		BE0780972A506FA600817E71 /* HeaderViewForEmojiAndColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderViewForEmojiAndColor.swift; sourceTree = "<group>"; };
@@ -239,7 +237,6 @@
 			isa = PBXGroup;
 			children = (
 				BEEE7C5C2A41CA0200315F2D /* SeparatorLineHelper.swift */,
-				BE00EE0E2A4A15C400599D28 /* DataManager.swift */,
 				BE0780992A50A39A00817E71 /* ColorsHelper.swift */,
 			);
 			name = Helpers;
@@ -338,7 +335,6 @@
 				BE00EE112A4ADB3D00599D28 /* PlaceholderView.swift in Sources */,
 				BE1E62BE2A3F89F8002185B2 /* TrackerModels.swift in Sources */,
 				BE0780982A506FA600817E71 /* HeaderViewForEmojiAndColor.swift in Sources */,
-				BE00EE0F2A4A15C400599D28 /* DataManager.swift in Sources */,
 				BE665AE72A601FAC00E3E3B9 /* TrackerRecordStore.swift in Sources */,
 				BEEE7C4E2A40412700315F2D /* CreateTrackerViewController.swift in Sources */,
 				BE638BC12A3C7D58005900C2 /* SceneDelegate.swift in Sources */,

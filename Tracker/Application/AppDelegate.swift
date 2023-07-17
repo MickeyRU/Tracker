@@ -12,7 +12,7 @@ import CoreData
 class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "TrackersCoreDataModel")
-        container.loadPersistentStores { storeDescription, error in
+        container.loadPersistentStores { decription, error in
             if let error = error as NSError? {
                 assertionFailure("Unable to load persistent stores: \(error)")
             }
