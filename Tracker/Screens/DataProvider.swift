@@ -15,6 +15,13 @@ protocol DataProviderDelegate: AnyObject {
 protocol DataProviderProtocol: AnyObject {
     var numberOfSections: Int { get }
     func numberOfRowsInSection(section: Int) -> Int
+    func nameOfSection(section: Int) -> String
+    
+    func fetchCategory(name: String) -> TrackerCategoryCoreData?
+    func createCategory(category: TrackerCategory) throws -> TrackerCategoryCoreData
+    
+    func addTracker(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws
+    func getTrackerObject(indexPath: IndexPath) -> Tracker?
     
     func addFiltersForFetchResultController(searchText: String, date: Date) throws
 }
@@ -65,6 +72,37 @@ extension DataProvider: DataProviderProtocol {
     
     func numberOfRowsInSection(section: Int) -> Int {
         fetchedResultsController.sections?[section].numberOfObjects ?? 0
+    }
+    
+    func nameOfSection(section: Int) -> String {
+        fetchedResultsController.sections?[section].name ?? ""
+    }
+    
+    func fetchCategory(name: String) -> TrackerCategoryCoreData? {
+        trackerCategoryStore.fetchCategory(name: name)
+    }
+    
+    func createCategory(category: TrackerCategory) throws -> TrackerCategoryCoreData {
+        do {
+            let newCategory = try trackerCategoryStore.createCategory(category: category)
+            return newCategory
+        } catch {
+            fatalError("Failed to create new category: \(error)")
+        }
+    }
+    
+    func addTracker(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws {
+        do {
+            try trackerStore.add(tracker: tracker, trackerCategoryCoreData: trackerCategoryCoreData)
+        } catch {
+            fatalError("Failed to addTracker: \(error)")
+        }
+    }
+    
+    func getTrackerObject(indexPath: IndexPath) -> Tracker? {
+        let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        guard let tracker = try? trackerStore.tracker(from: trackerCoreData) else { return nil }
+        return tracker
     }
     
     func addFiltersForFetchResultController(searchText: String, date: Date) throws {

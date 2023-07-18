@@ -79,6 +79,7 @@ final class TrackersViewController: UIViewController {
             //TODO: show alert
             print(error.localizedDescription)
         }
+        trackersCollectionView.reloadData()
     }
     
     private func setupNavigationBar() {
@@ -175,33 +176,36 @@ final class TrackersViewController: UIViewController {
             // Проверяем что в юзеринфо есть два объекта - категория и трекер
             if let category = userInfo["Category"] as? TrackerCategory,
                let tracker = userInfo["NewTracker"] as? Tracker {
-                // Если категория уже существует в главное хранилище трекеров "categories", то обновляем
-                if let index = self.categories.firstIndex(where: {$0.name == category.name}) {
-                    let oldCategory = self.categories.remove(at: index)
-                    let oldTrackersArray = oldCategory.trackers
-
-                    // Создаем новый массив трекеров, добавляя новый трекер
-                    var updatedTrackersArray = oldTrackersArray
-                    updatedTrackersArray.append(tracker)
-
-                    // Создаем новый экземпляр TrackerCategory с обновленным списком трекеров
-                    let updatedCategory = TrackerCategory(name: oldCategory.name, trackers: updatedTrackersArray)
-
-                    self.categories.insert(updatedCategory, at: index)
+                // Работаем с категорией в кор дате
+                var categoryCoreData: TrackerCategoryCoreData?
+                
+                if let existingCategory = self.dataProvider.fetchCategory(name: category.name) {
+                    categoryCoreData = existingCategory
                 } else {
-                    let newCategory = TrackerCategory(name: category.name, trackers: [tracker])
-                    self.categories.append(newCategory)
+                    do {
+                        let newCategory = try self.dataProvider.createCategory(category: TrackerCategory(name: category.name,
+                                                                                                         trackers: []))
+                        categoryCoreData = newCategory
+                    } catch {
+                        print(error.localizedDescription)
+                    }
                 }
-                updateDate()
-                reloadVisibleCategories(text: searchTextField.text, date: currentDate)
+                // Работаем с трекером в кор дате - по аналогии с категорией
+                guard let categoryCoreData = categoryCoreData else { return }
+                do {
+                    try self.dataProvider.addTracker(tracker: tracker, trackerCategoryCoreData: categoryCoreData)
+                } catch {
+                    print(error.localizedDescription)
+                }
             }
+            reloadData()
         }
     }
     
     @objc
     private func dateChanged() {
         updateDate()
-        reloadVisibleCategories(text: searchTextField.text, date: currentDate)
+        reloadData()
     }
     
     @objc
@@ -214,7 +218,6 @@ final class TrackersViewController: UIViewController {
 }
 
 // MARK: - UICollectionViewDataSource
-
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         dataProvider.numberOfSections
@@ -228,9 +231,12 @@ extension TrackersViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCell.reuseIdentifier, for: indexPath) as? TrackerCell else { return UICollectionViewCell() }
         cell.delegate = self
         
-        let cellData = visibleCategories
-        let tracker = cellData[indexPath.section].trackers[indexPath.row]
-                
+        guard let tracker = dataProvider.getTrackerObject(indexPath: indexPath) else { return UICollectionViewCell() }
+        
+//        let uuidString = tracker.id.uuidString
+//        let recordCountForTracker = dataProvider.countRecordForTracker(trackerID: uuidString)
+//        let trackerTrackedToday = dataProvider.trackerTrackedToday(date: getDayWithoutTime(date: currentDate), trackerID: uuidString)
+        
         let isCompletedToday = isTrackerCompletedToday(id: tracker.id)
         let completedDays = completedTrackers.filter { $0.trackerID == tracker.id }.count
         cell.configCell(
@@ -244,8 +250,8 @@ extension TrackersViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! HeaderMainScreenView
-        let category = visibleCategories[indexPath.section]
-        headerView.titleLabel.text = category.name
+        let sectionName = dataProvider.nameOfSection(section: indexPath.section)
+        headerView.titleLabel.text = sectionName
         return headerView
     }
 }
