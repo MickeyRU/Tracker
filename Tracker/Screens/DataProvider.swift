@@ -14,6 +14,8 @@ protocol DataProviderDelegate: AnyObject {
 
 protocol DataProviderProtocol: AnyObject {
     var numberOfSections: Int { get }
+    var numberOfTrackers: Int { get }
+
     func numberOfRowsInSection(section: Int) -> Int
     func nameOfSection(section: Int) -> String
     
@@ -21,7 +23,13 @@ protocol DataProviderProtocol: AnyObject {
     func createCategory(category: TrackerCategory) throws -> TrackerCategoryCoreData
     
     func addTracker(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws
+    func getTrackerCoreData(indexPath: IndexPath) -> TrackerCoreData
     func getTrackerObject(indexPath: IndexPath) -> Tracker?
+    
+    func addNewTrackerRecord(trackerRecord: TrackerRecord, trackerCoreData: TrackerCoreData) throws
+    func deleteRecord(date: Date, trackerID: String) throws
+    func countRecordForTracker(trackerID: String) -> Int
+    func trackerTrackedToday(date: Date, trackerID: String) -> Bool
     
     func addFiltersForFetchResultController(searchText: String, date: Date) throws
 }
@@ -70,6 +78,11 @@ extension DataProvider: DataProviderProtocol {
         fetchedResultsController.sections?.count ?? 0
     }
     
+    var numberOfTrackers: Int {
+        fetchedResultsController.fetchedObjects?.count ?? 0
+    }
+
+    
     func numberOfRowsInSection(section: Int) -> Int {
         fetchedResultsController.sections?[section].numberOfObjects ?? 0
     }
@@ -103,6 +116,34 @@ extension DataProvider: DataProviderProtocol {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
         guard let tracker = try? trackerStore.tracker(from: trackerCoreData) else { return nil }
         return tracker
+    }
+    
+    func getTrackerCoreData(indexPath: IndexPath) -> TrackerCoreData {
+        fetchedResultsController.object(at: indexPath)
+    }
+    
+    func addNewTrackerRecord(trackerRecord: TrackerRecord, trackerCoreData: TrackerCoreData) throws {
+        do {
+            try trackerRecordsStore.add(newRecord: trackerRecord, for: trackerCoreData)
+        } catch {
+            fatalError("Failed to addTrackerRecord: \(error)")
+        }
+    }
+    
+    func deleteRecord(date: Date, trackerID: String) throws {
+        do {
+            try trackerRecordsStore.deleteRecord(date: date, trackerID: trackerID)
+        } catch {
+            fatalError("Failed to deleteTrackerRecord: \(error)")
+        }
+    }
+    
+    func countRecordForTracker(trackerID: String) -> Int {
+        trackerRecordsStore.countRecordForTracker(trackerID: trackerID)
+    }
+    
+    func trackerTrackedToday(date: Date, trackerID: String) -> Bool {
+        trackerRecordsStore.trackerTrackedToday(date: date, trackerID: trackerID)
     }
     
     func addFiltersForFetchResultController(searchText: String, date: Date) throws {
