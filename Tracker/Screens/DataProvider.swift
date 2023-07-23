@@ -32,6 +32,8 @@ protocol DataProviderProtocol: AnyObject {
     func trackerTrackedToday(date: Date, trackerID: String) -> Bool
     
     func addFiltersForFetchResultController(searchText: String, date: Date) throws
+    
+    func setUpDelegates(trackersViewController: TrackersViewController)
 }
 
 final class DataProvider: NSObject {
@@ -64,7 +66,7 @@ final class DataProvider: NSObject {
     init(trackerStore: TrackerStoreProtocol,
          trackerCategoryStore: TrackerCategoryStoreProtocol,
          trackerRecordsStore: TrackerRecordStoreProtocol,
-         delegate: DataProviderDelegate) {
+         delegate: DataProviderDelegate?) {
         self.context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         self.trackerStore = trackerStore
         self.trackerCategoryStore = trackerCategoryStore
@@ -166,6 +168,11 @@ extension DataProvider: DataProviderProtocol {
         } catch {
             fatalError("Failed to fetch data with Predicates in method addFiltersForFetchResultController: \(error)")
         }
+    }
+    
+    func setUpDelegates(trackersViewController: TrackersViewController) {
+        self.delegate = trackersViewController
+        self.trackerRecordsStore.delegate = trackersViewController
     }
 }
 

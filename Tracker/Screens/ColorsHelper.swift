@@ -10,7 +10,7 @@ import UIKit
 final class ColorsHelper {
     static let shared = ColorsHelper()
     
-    func GenerateColors() -> [UIColor] {
+    func makeColors() -> [UIColor] {
         var colors = [UIColor]()
         
         for color in 1...18 {

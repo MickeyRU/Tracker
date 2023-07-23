@@ -10,15 +10,16 @@ import UIKit
 final class ColorCell: UICollectionViewCell {
     static let reuseIdentifier = "ColorCell"
     
-    private var colorView: UIView = {
+    private let colorView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 8
         return view
     }()
     
-    override init(frame: CGRect) {
+    private override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
+
     }
     
     required init?(coder: NSCoder) {
@@ -40,8 +41,8 @@ final class ColorCell: UICollectionViewCell {
         self.colorView.backgroundColor = color
     }
     
-    func colorIsSelected(isSelected: Bool) {
-        if isSelected == true {
+    func didSelectColor(isSelected: Bool) {
+        if isSelected {
             self.layer.borderWidth = 3
             self.layer.cornerRadius = 8
             self.layer.borderColor = self.colorView.backgroundColor?.cgColor.copy(alpha: 0.3)

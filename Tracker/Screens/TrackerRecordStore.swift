@@ -13,6 +13,7 @@ protocol TrackerRecordStoreDelegate: AnyObject {
 }
 
 protocol TrackerRecordStoreProtocol: AnyObject {
+    var delegate: TrackerRecordStoreDelegate? { get set }
     func add(newRecord: TrackerRecord, for trackerCoreData: TrackerCoreData?) throws
     func deleteRecord(date: Date, trackerID: String) throws
     
@@ -26,7 +27,7 @@ final class TrackerRecordStore: NSObject {
     private let context: NSManagedObjectContext
     private var completedTrackers: [TrackerRecord] = []
     
-    init(delegate: TrackerRecordStoreDelegate) {
+    init(delegate: TrackerRecordStoreDelegate?) {
         self.context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         self.delegate = delegate
     }

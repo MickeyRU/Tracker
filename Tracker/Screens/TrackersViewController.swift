@@ -8,11 +8,9 @@
 import UIKit
 
 final class TrackersViewController: UIViewController {
-    private var dataProvider: DataProviderProtocol!
-
+    private let dataProvider: DataProviderProtocol
     private var completedTrackers: [TrackerRecord] = []
-    // Текущая дата
-    private var currentDate: Date!
+    private var currentDate: Date
     // Параметры для настройки размеров коллекции
     private var params = GeometricParams(cellCount: 2, leftInset: 16, rightInset: 16, cellSpacing: 9)
     
@@ -43,13 +41,24 @@ final class TrackersViewController: UIViewController {
         title: "Что будем отслеживать?"
     )
     
+    init() {
+        self.dataProvider = DataProvider(trackerStore: TrackerStore(),
+                                         trackerCategoryStore: TrackerCategoryStore(),
+                                         trackerRecordsStore: TrackerRecordStore(delegate: nil),
+                                         delegate: nil)
+        self.currentDate = Date()
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.dataProvider = DataProvider(trackerStore: TrackerStore(),
-                                         trackerCategoryStore: TrackerCategoryStore(),
-                                         trackerRecordsStore: TrackerRecordStore(delegate: self),
-                                         delegate: self)
+        dataProvider.setUpDelegates(trackersViewController: self)
+        
         updateDate()
         reloadData(searchText: nil)
         
@@ -127,9 +136,10 @@ final class TrackersViewController: UIViewController {
         }
     }
     
-    private func getDayWithoutTime(date: Date) -> Date {
-        let dateWithoutTime = Calendar.current.dateComponents([.year, .month, .day], from: date)
-        return Calendar.current.date(from: dateWithoutTime)!
+    private func getDayWithZeroedTime(date: Date) -> Date {
+        let dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        guard let dayWithZeroedTime = Calendar.current.date(from: dateComponents) else { return Date() }
+        return dayWithZeroedTime
     }
     
     @objc
@@ -194,7 +204,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         
         guard let tracker = dataProvider.getTrackerObject(indexPath: indexPath) else { return UICollectionViewCell() }
         
-        let isCompletedToday = dataProvider.trackerTrackedToday(date: getDayWithoutTime(date: currentDate), trackerID: tracker.id.uuidString)
+        let isCompletedToday = dataProvider.trackerTrackedToday(date: getDayWithZeroedTime(date: currentDate), trackerID: tracker.id.uuidString)
         let completedDays = dataProvider.countRecordForTracker(trackerID: tracker.id.uuidString)
         
         cell.configCell(
@@ -208,7 +218,7 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as! HeaderMainScreenView
+        guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as? HeaderMainScreenView else { return UICollectionReusableView() }
         let sectionName = dataProvider.nameOfSection(section: indexPath.section)
         headerView.titleLabel.text = sectionName
         return headerView
@@ -247,7 +257,7 @@ extension TrackersViewController: TrackerCellDelegate {
         if realDate < currentDate {
             print("Попытка изменить количество выполнений трекера в будущей дате")
         } else {
-            let trackerRecord = TrackerRecord(trackerID: id, date: getDayWithoutTime(date: currentDate))
+            let trackerRecord = TrackerRecord(trackerID: id, date: getDayWithZeroedTime(date: currentDate))
             let trackerCoreData = dataProvider.getTrackerCoreData(indexPath: indexPath)
             do {
                 try dataProvider.addNewTrackerRecord(trackerRecord: trackerRecord, trackerCoreData: trackerCoreData)
@@ -264,7 +274,7 @@ extension TrackersViewController: TrackerCellDelegate {
             print("Попытка изменить количество выполнений трекера в будущей дате")
         } else {
             do {
-                try dataProvider.deleteRecord(date: getDayWithoutTime(date: currentDate), trackerID: id.uuidString)
+                try dataProvider.deleteRecord(date: getDayWithZeroedTime(date: currentDate), trackerID: id.uuidString)
             } catch {
                 print(error.localizedDescription)
             }

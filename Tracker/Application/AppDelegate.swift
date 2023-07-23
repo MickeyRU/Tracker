@@ -10,7 +10,7 @@ import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    lazy var persistentContainer: NSPersistentContainer = {
+   private(set) lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "TrackersCoreDataModel")
         container.loadPersistentStores { decription, error in
             if let error = error as NSError? {

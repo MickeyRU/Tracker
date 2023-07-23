@@ -8,7 +8,7 @@
 import UIKit
 
 final class HeaderViewForEmojiAndColor: UICollectionReusableView {
-    let titleLabel: UILabel = {
+   private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 19, weight: .bold)
         return label
@@ -16,7 +16,18 @@ final class HeaderViewForEmojiAndColor: UICollectionReusableView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        setupViews()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setupHeaderView(text: String) {
+        self.titleLabel.text = text
+    }
+    
+    private func setupViews() {
         addViewsWithNoTAMIC(titleLabel)
         
         NSLayoutConstraint.activate([
@@ -24,9 +35,5 @@ final class HeaderViewForEmojiAndColor: UICollectionReusableView {
             titleLabel.topAnchor.constraint(equalTo: topAnchor),
             titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

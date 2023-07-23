@@ -10,7 +10,7 @@ import UIKit
 final class EmojiCell: UICollectionViewCell {
     static let reuseIdentifier = "EmojiCell"
     
-    private var emojiTextLabel: UILabel = {
+    private let emojiTextLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 31)
         return label
@@ -40,7 +40,7 @@ final class EmojiCell: UICollectionViewCell {
         self.emojiTextLabel.text = emoji
     }
     
-    func emojiIsSelected(isSelected: Bool) {
+    func didSelectEmoji(isSelected: Bool) {
         if isSelected == true {
             self.backgroundColor = UIColor.systemGray5
             self.layer.cornerRadius = 16

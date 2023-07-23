@@ -13,7 +13,7 @@ final class CreateTrackerViewController: UIViewController {
     private var weekSchedule = [WeekDay]()
     
     private let emojiArray = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪"]
-    private let colorsArray = ColorsHelper.shared.GenerateColors()
+    private let colorsArray = ColorsHelper.shared.makeColors()
     
     private var selectedEmoji: [Int: String] = [:]
     private var selectedColor: [Int: UIColor] = [:]
@@ -292,9 +292,9 @@ extension CreateTrackerViewController: UICollectionViewDataSource {
         let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Emoji", for: indexPath) as! HeaderViewForEmojiAndColor
         switch indexPath.section {
         case 0:
-            headerView.titleLabel.text = "Emoji"
+            headerView.setupHeaderView(text: "Emoji")
         case 1:
-            headerView.titleLabel.text = "Цвет"
+            headerView.setupHeaderView(text: "Цвет")
         default:
             assertionFailure("Свитч вышел в дефолтный")
             break
@@ -342,7 +342,7 @@ extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
             if selectedEmoji[indexPath.row] != nil {
                 // Отменяем выбор
                 selectedEmoji.removeValue(forKey: indexPath.row)
-                cell.emojiIsSelected(isSelected: false)
+                cell.didSelectEmoji(isSelected: false)
             } else {
                 // Проверяем, есть ли уже выбранное значение
                 if let oldChosenEmojiIndex = selectedEmoji.keys.first {
@@ -351,7 +351,7 @@ extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
                     
                     // Отменяем выделение у предыдущей ячейки
                     if let oldChosenCell = collectionView.cellForItem(at: IndexPath(row: oldChosenEmojiIndex, section: indexPath.section)) as? EmojiCell {
-                        oldChosenCell.emojiIsSelected(isSelected: false)
+                        oldChosenCell.didSelectEmoji(isSelected: false)
                     }
                 }
                 
@@ -359,7 +359,7 @@ extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
                 selectedEmoji[indexPath.row] = emoji
                 
                 // Выделяем ячейку
-                cell.emojiIsSelected(isSelected: true)
+                cell.didSelectEmoji(isSelected: true)
             }
         case 1:
             guard let cell = collectionView.cellForItem(at: indexPath) as? ColorCell else { return }
@@ -367,19 +367,19 @@ extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
             
             if selectedColor[indexPath.row] != nil {
                 selectedColor.removeValue(forKey: indexPath.row)
-                cell.colorIsSelected(isSelected: false)
+                cell.didSelectColor(isSelected: false)
             } else {
                 if let oldChosenColorIndex = selectedColor.keys.first {
                     selectedColor.removeValue(forKey: oldChosenColorIndex)
                     
                     if let oldChosenCell = collectionView.cellForItem(at: IndexPath(row: oldChosenColorIndex, section: indexPath.section)) as? ColorCell {
-                        oldChosenCell.colorIsSelected(isSelected: false)
+                        oldChosenCell.didSelectColor(isSelected: false)
                     }
                 }
                 
                 selectedColor[indexPath.row] = color
                 
-                cell.colorIsSelected(isSelected: true)
+                cell.didSelectColor(isSelected: true)
             }
         default:
             print("-------default---------\(indexPath.section)")
