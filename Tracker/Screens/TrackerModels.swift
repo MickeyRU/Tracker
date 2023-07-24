@@ -53,6 +53,10 @@ enum WeekDay: CaseIterable {
             return "Суббота"
         }
     }
+    
+    static func getWeekDayInNumber(for date: Date) -> String {
+        String(Calendar.current.component(.weekday, from: date))
+    }
 }
 
 
@@ -62,14 +66,6 @@ struct Tracker {
     let color: UIColor
     let emoji: String
     let schedule: [WeekDay]
-    
-    init(name: String, color: UIColor, emoji: String, schedule: [WeekDay]) {
-        self.id = UUID()
-        self.name = name
-        self.color = color
-        self.emoji = emoji
-        self.schedule = schedule
-    }
 }
 
 struct TrackerCategory {

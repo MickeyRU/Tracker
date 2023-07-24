@@ -6,9 +6,20 @@
 //
 
 import UIKit
+import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+   private(set) lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "TrackersCoreDataModel")
+        container.loadPersistentStores { decription, error in
+            if let error = error as NSError? {
+                assertionFailure("Unable to load persistent stores: \(error)")
+            }
+        }
+        return container
+    }()
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         return true
     }

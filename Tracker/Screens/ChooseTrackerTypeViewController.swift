@@ -1,5 +1,5 @@
 //
-//  CreateTrackerViewController.swift
+//  ChooseTrackerTypeViewController.swift
 //  Tracker
 //
 //  Created by Павел Афанасьев on 18.06.2023.
