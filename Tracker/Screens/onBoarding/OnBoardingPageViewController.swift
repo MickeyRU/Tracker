@@ -40,6 +40,7 @@ final class OnBoardingPageViewController: UIPageViewController {
         super.viewDidLoad()
         
         dataSource = self
+        delegate = self
         
         if let firstScreen = pages.first {
             setViewControllers([firstScreen], direction: .forward, animated: true)
@@ -96,5 +97,17 @@ extension OnBoardingPageViewController: UIPageViewControllerDataSource {
         }
         
         return pages[nextIndex]
+    }
+}
+
+// MARK: - UIPageViewControllerDelegate
+extension OnBoardingPageViewController: UIPageViewControllerDelegate {
+    func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+        guard
+            let currentViewController = pageViewController.viewControllers?.first,
+            let currentIndex = pages.firstIndex(of: currentViewController)
+        else { return }
+        
+        pageControl.currentPage = currentIndex
     }
 }
