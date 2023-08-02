@@ -233,8 +233,11 @@ extension CreateTrackerViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0 {
-            // ToDo: реализовать выбор категории
-            print("Нажали кнопку категория")
+            let model = CategoriesModel()
+            let viewModel = CategoriesListViewModel(model: model)
+            let vc = CategoriesListViewController(viewModel: viewModel)
+            vc.bind()
+            present(vc, animated: true)
         } else {
             // ToDo: реализовать выбор расписания
             let scheduleViewController = ScheduleViewController()

@@ -15,6 +15,7 @@ struct Images {
     static let addDaysButtonClickedImage = UIImage(named: "addDaysButtonClickedImage")?.withRenderingMode(.alwaysOriginal)
     static let arrowImage = UIImage(named: "arrowImage")
     static let emptyOnScreenImage = UIImage(named: "emptyOnScreenImage")
+    static let selectedImage = UIImage(named: "selectedImage")
     
     static let onBoardingRedImage = UIImage(named: "red")
     static let onBoardingBlueImage = UIImage(named: "blue")

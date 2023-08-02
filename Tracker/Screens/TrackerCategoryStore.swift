@@ -8,7 +8,6 @@
 import UIKit
 import CoreData
 
-
 protocol TrackerCategoryStoreProtocol: AnyObject {
     func fetchCategory(name: String) -> TrackerCategoryCoreData?
     func createCategory(category: TrackerCategory) throws -> TrackerCategoryCoreData
