@@ -9,6 +9,10 @@ import UIKit
 import CoreData
 
 protocol TrackerCategoryStoreProtocol: AnyObject {
+    var categories: [TrackerCategoryCoreData] {
+        get
+    }
+    
     func fetchCategory(name: String) -> TrackerCategoryCoreData?
     func createCategory(category: TrackerCategory) throws -> TrackerCategoryCoreData
 }
@@ -19,9 +23,26 @@ final class TrackerCategoryStore: NSObject {
     override init() {
         self.context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     }
+    
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
+
+        let fetchRequest = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
+        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.name, ascending: true)]
+        
+        let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
+                                                                  managedObjectContext: context,
+                                                                  sectionNameKeyPath: nil,
+                                                                  cacheName: nil)
+        try? fetchedResultsController.performFetch()
+        return fetchedResultsController
+    }()
 }
 
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
+    var categories: [TrackerCategoryCoreData] {
+        return self.fetchedResultsController.fetchedObjects ?? []
+    }
+    
     func fetchCategory(name: String) -> TrackerCategoryCoreData? {
         let request = TrackerCategoryCoreData.fetchRequest()
         request.fetchLimit = 1

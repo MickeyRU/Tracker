@@ -14,6 +14,7 @@ final class CategoriesListViewModel {
     ///   оповещает View об изменении своего состояния;
     ///   содержит функции, через вызовы которых View может изменять Model;
     ///   НЕ управляет View и ничего не знает о пользовательском интерфейсе.
+    
     @Observable
     private(set)var categories: [Category] = []
     
@@ -28,7 +29,7 @@ final class CategoriesListViewModel {
         convertDataToUI(with: existedCategories)
     }
     
-    private func convertDataToUI(with categories: [TrackerCategory]?) {
+    private func convertDataToUI(with categories: [Category]?) {
         if let categories = categories {
             for element in categories {
                 let category = Category(name: element.name)
@@ -39,5 +40,4 @@ final class CategoriesListViewModel {
     
     /// Создайте ViewModel, которая будет связана с таблицей. ViewModel должна содержать методы для получения данных из модели и для подготовки данных для отображения в ячейках таблицы.
     /// ViewModel также должна содержать логику для обработки действий пользователя (например, выбор ячейки таблицы).
-
 }

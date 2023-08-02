@@ -58,7 +58,8 @@ final class CategoriesListViewController: UIViewController {
     }
     
     @objc private func addCategoryButtonTapped() {
-        // ToDo: - функционал добавления категории к трекеру
+        let destinationVC = NewCategoryViewController()
+        present(destinationVC, animated: true)
     }
         
      func bind() {
