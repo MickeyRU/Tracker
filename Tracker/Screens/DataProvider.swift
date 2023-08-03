@@ -64,8 +64,8 @@ final class DataProvider: NSObject {
     }()
     
     init(trackerStore: TrackerStoreProtocol,
-         trackerCategoryStore: TrackerCategoryStoreProtocol,
          trackerRecordsStore: TrackerRecordStoreProtocol,
+         trackerCategoryStore: TrackerCategoryStoreProtocol,
          delegate: DataProviderDelegate?) {
         self.context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         self.trackerStore = trackerStore

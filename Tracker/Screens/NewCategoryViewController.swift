@@ -7,7 +7,14 @@
 
 import UIKit
 
+protocol NewCategoryViewControllerDelegate: AnyObject {
+    func userAddNewCategory(viewController: UIViewController, category: TrackerCategory)
+}
+
 final class NewCategoryViewController: UIViewController {
+    weak var delegate: NewCategoryViewControllerDelegate?
+    private let viewModel: NewCategoryViewModel
+    
     private var pageTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Новая Категория"
@@ -33,13 +40,23 @@ final class NewCategoryViewController: UIViewController {
     private lazy var doneButton: UIButton = {
         let button = UIButton()
         button.setTitle("Готово", for: .normal)
-        button.backgroundColor = .black
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = .white
         button.layer.cornerRadius = 16
+        button.backgroundColor = .gray
+        button.isUserInteractionEnabled = false
         button.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
         return button
     }()
+    
+    init(viewModel: NewCategoryViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,8 +66,18 @@ final class NewCategoryViewController: UIViewController {
         setupViews()
     }
     
-    @objc private func doneButtonTapped() {
-        // ToDo: - нажатие на кнопку готово, добавить действие
+    @objc
+    private func doneButtonTapped() {
+        guard let categoryName = categoryNameTextField.text else { return }
+        let newCategory = TrackerCategory(name: categoryName, trackers: [])
+        delegate?.userAddNewCategory(viewController: self, category: newCategory)
+    }
+    
+    func bind() {
+        viewModel.$isNameFieldFilled.bind { [weak self] isFilled in
+            guard let self = self else { return }
+            updateButtonStatus(isAllowed: isFilled)
+        }
     }
     
     private func setupViews() {
@@ -71,6 +98,16 @@ final class NewCategoryViewController: UIViewController {
             doneButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50)
         ])
     }
+    
+    private func updateButtonStatus(isAllowed: Bool) {
+        if isAllowed {
+            doneButton.isUserInteractionEnabled = true
+            doneButton.backgroundColor = .black
+        } else {
+            doneButton.isUserInteractionEnabled = false
+            doneButton.backgroundColor = .gray
+        }
+    }
 }
 
 // MARK: - UITextFieldDelegate
@@ -78,6 +115,7 @@ final class NewCategoryViewController: UIViewController {
 extension NewCategoryViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        viewModel.checkNameFieldFilled(text: textField.text)
         return true
     }
 }

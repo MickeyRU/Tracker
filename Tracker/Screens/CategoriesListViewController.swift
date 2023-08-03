@@ -58,7 +58,11 @@ final class CategoriesListViewController: UIViewController {
     }
     
     @objc private func addCategoryButtonTapped() {
-        let destinationVC = NewCategoryViewController()
+        let model = NewCategoryModel()
+        let viewModel = NewCategoryViewModel(model: model)
+        let destinationVC = NewCategoryViewController(viewModel: viewModel)
+        destinationVC.delegate = self
+        destinationVC.bind()
         present(destinationVC, animated: true)
     }
         
@@ -79,7 +83,7 @@ final class CategoriesListViewController: UIViewController {
             categoriesTableView.topAnchor.constraint(equalTo: pageTitleLabel.bottomAnchor, constant: 38),
             categoriesTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             categoriesTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            categoriesTableView.heightAnchor.constraint(equalToConstant: CGFloat(viewModel.categories.count * 75)),
+            categoriesTableView.bottomAnchor.constraint(equalTo: addCategoryButton.topAnchor, constant: -39),
             
             addCategoryButton.heightAnchor.constraint(equalToConstant: 60),
             addCategoryButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -103,7 +107,8 @@ extension CategoriesListViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reuseIdentifier) as? CategoryCell else { return UITableViewCell() }
-//        cell.configCell(nameLabel: String)
+        let cellName = viewModel.categories[indexPath.row].name
+        cell.configCell(nameLabel: cellName)
         // ToDo: - дописать настройку ячейки
         return cell
     }
@@ -117,5 +122,15 @@ extension CategoriesListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         SeparatorLineHelper.configSeparatingLine(tableView: tableView, cell: cell, indexPath: indexPath)
+    }
+}
+
+extension CategoriesListViewController: NewCategoryViewControllerDelegate {
+    func userAddNewCategory(viewController: UIViewController, category: TrackerCategory) {
+        viewController.dismiss(animated: true) { [weak self] in
+            guard let self = self else { return }
+            viewModel.addNewCategory(category: category)
+            categoriesTableView.reloadData()
+        }
     }
 }

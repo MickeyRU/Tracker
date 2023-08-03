@@ -8,13 +8,8 @@
 import Foundation
 
 final class CategoriesModel {
-    
-    private let categoryStore: TrackerCategoryStoreProtocol
-    
-    init() {
-        self.categoryStore = TrackerCategoryStore()
-    }
-    
+    private let categoryStore = TrackerCategoryStore()
+
     /// Model (Модель):
     /// хранит состояние данных из предметной области приложения, то есть той области человеческой деятельности, для которой мы создаём приложение (доставка цветов, обмен сообщениями и так далее);
     /// обрабатывает их в соответствии с логикой предметной области.
@@ -29,5 +24,13 @@ final class CategoriesModel {
             guard let name = $0.name else { return nil }
             return Category(name: name)
         }
+    }
+    
+    func addNewCategory(category: TrackerCategory) {
+        try? categoryStore.addNewCategory(category)
+    }
+    
+    func setupDelegate(vc: CategoriesListViewModel) {
+        self.categoryStore.setDelegate(delegateForStore: vc)
     }
 }

@@ -22,11 +22,16 @@ final class CategoriesListViewModel {
     
     init(model: CategoriesModel) {
         self.model = model
+        model.setupDelegate(vc: self)
     }
     
     func loadCategoriesList() {
         let existedCategories = model.loadCategoriesFromCoreData()
         convertDataToUI(with: existedCategories)
+    }
+    
+    func addNewCategory(category: TrackerCategory) {
+        model.addNewCategory(category: category)
     }
     
     private func convertDataToUI(with categories: [Category]?) {
@@ -40,4 +45,11 @@ final class CategoriesListViewModel {
     
     /// Создайте ViewModel, которая будет связана с таблицей. ViewModel должна содержать методы для получения данных из модели и для подготовки данных для отображения в ячейках таблицы.
     /// ViewModel также должна содержать логику для обработки действий пользователя (например, выбор ячейки таблицы).
+}
+
+extension CategoriesListViewModel: TrackerCategoryStoreDelegate {
+    func categoriesDidUpdate() {
+        categories.removeAll()
+        loadCategoriesList()
+    }
 }
