@@ -7,14 +7,19 @@
 
 import UIKit
 
+protocol CategoriesListViewControllerDelegate: AnyObject {
+    func categoryIsChosen(categoryName: String)
+}
+
 final class CategoriesListViewController: UIViewController {
-    
-    ///   View (Представление):
-    ///   формирует пользовательский интерфейс (экраны, кнопки и так далее);
-    ///   наблюдает за изменениями данных ViewModel через байндинг, при изменениях меняет интерфейс;
-    ///   вызывает команды ViewModel, когда пользователь воздействует на какой-либо элемент интерфейса.
+    weak var delegate: CategoriesListViewControllerDelegate?
     
     private var viewModel: CategoriesListViewModel
+    private var chosenCategoryName: String?
+    
+    private let placeholderView = PlaceholderView(
+        title: "Привычки и события можно объединить по смыслу?"
+    )
     
     private let pageTitleLabel: UILabel = {
         let label = UILabel()
@@ -52,12 +57,14 @@ final class CategoriesListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-
+        
         setupViews()
         setupTableView()
+        checkCategoryList()
     }
     
-    @objc private func addCategoryButtonTapped() {
+    @objc
+    private func addCategoryButtonTapped() {
         let model = NewCategoryModel()
         let viewModel = NewCategoryViewModel(model: model)
         let destinationVC = NewCategoryViewController(viewModel: viewModel)
@@ -65,8 +72,8 @@ final class CategoriesListViewController: UIViewController {
         destinationVC.bind()
         present(destinationVC, animated: true)
     }
-        
-     func bind() {
+    
+    func bind() {
         viewModel.$categories.bind { [weak self] _ in
             guard let self = self else { return }
             self.categoriesTableView.reloadData()
@@ -74,9 +81,12 @@ final class CategoriesListViewController: UIViewController {
     }
     
     private func setupViews() {
-        [pageTitleLabel, categoriesTableView, addCategoryButton].forEach { view.addViewsWithNoTAMIC($0) }
+        [pageTitleLabel, categoriesTableView, addCategoryButton, placeholderView].forEach { view.addViewsWithNoTAMIC($0) }
         
         NSLayoutConstraint.activate([
+            placeholderView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            placeholderView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
             pageTitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             pageTitleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 27),
             
@@ -96,41 +106,67 @@ final class CategoriesListViewController: UIViewController {
         categoriesTableView.dataSource = self
         categoriesTableView.delegate = self
         categoriesTableView.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.reuseIdentifier)
-    }
-}
-
-// MARK: - UITableViewDataSource
-extension CategoriesListViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel.categories.count
+        categoriesTableView.layer.cornerRadius = 16
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reuseIdentifier) as? CategoryCell else { return UITableViewCell() }
-        let cellName = viewModel.categories[indexPath.row].name
-        cell.configCell(nameLabel: cellName)
-        // ToDo: - дописать настройку ячейки
-        return cell
-    }
-}
-
-// MARK: - UITableViewDelegate
-extension CategoriesListViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        75
-    }
-    
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        SeparatorLineHelper.configSeparatingLine(tableView: tableView, cell: cell, indexPath: indexPath)
-    }
-}
-
-extension CategoriesListViewController: NewCategoryViewControllerDelegate {
-    func userAddNewCategory(viewController: UIViewController, category: TrackerCategory) {
-        viewController.dismiss(animated: true) { [weak self] in
-            guard let self = self else { return }
-            viewModel.addNewCategory(category: category)
-            categoriesTableView.reloadData()
+    private func checkCategoryList() {
+        if viewModel.categories.count == 0 {
+            placeholderView.isHidden = false
+        } else {
+            placeholderView.isHidden = true
         }
     }
 }
+    
+    // MARK: - UITableViewDataSource
+    extension CategoriesListViewController: UITableViewDataSource {
+        func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+            viewModel.categories.count
+        }
+        
+        func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reuseIdentifier) as? CategoryCell else { return UITableViewCell() }
+            let cellName = viewModel.categories[indexPath.row].name
+            var isSelected = false
+            if cellName == chosenCategoryName {
+                isSelected = true
+            }
+            cell.configCell(nameLabel: cellName, isSelected: isSelected)
+            cell.selectionStyle = .none
+            return cell
+        }
+    }
+    
+    // MARK: - UITableViewDelegate
+    extension CategoriesListViewController: UITableViewDelegate {
+        func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+            75
+        }
+        
+        func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+            SeparatorLineHelper.configSeparatingLine(tableView: tableView, cell: cell, indexPath: indexPath)
+        }
+        
+        func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+            let selectedCategory = viewModel.categories[indexPath.row]
+            delegate?.categoryIsChosen(categoryName: selectedCategory.name)
+            dismiss(animated: true)
+        }
+    }
+    
+    extension CategoriesListViewController: NewCategoryViewControllerDelegate {
+        func userAddNewCategory(viewController: UIViewController, category: TrackerCategory) {
+            viewController.dismiss(animated: true) { [weak self] in
+                guard let self = self else { return }
+                viewModel.addNewCategory(category: category)
+                categoriesTableView.reloadData()
+                checkCategoryList()
+            }
+        }
+    }
+    
+    extension CategoriesListViewController: CreateTrackerViewControllerDelegate {
+        func chosenCategory(name: String) {
+            chosenCategoryName = name
+        }
+    }

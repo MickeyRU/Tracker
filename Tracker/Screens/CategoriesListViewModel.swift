@@ -34,17 +34,18 @@ final class CategoriesListViewModel {
         model.addNewCategory(category: category)
     }
     
+    func selectCategory(index: Int) {
+        categories[index].isSelected = true
+    }
+    
     private func convertDataToUI(with categories: [Category]?) {
         if let categories = categories {
             for element in categories {
-                let category = Category(name: element.name)
+                let category = Category(name: element.name, isSelected: element.isSelected)
                 self.categories.append(category)
             }
         }
     }
-    
-    /// Создайте ViewModel, которая будет связана с таблицей. ViewModel должна содержать методы для получения данных из модели и для подготовки данных для отображения в ячейках таблицы.
-    /// ViewModel также должна содержать логику для обработки действий пользователя (например, выбор ячейки таблицы).
 }
 
 extension CategoriesListViewModel: TrackerCategoryStoreDelegate {

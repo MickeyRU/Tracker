@@ -9,4 +9,5 @@ import Foundation
 
 struct Category {
     let name: String
+    var isSelected: Bool
 }

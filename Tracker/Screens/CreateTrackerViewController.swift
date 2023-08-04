@@ -7,7 +7,12 @@
 
 import UIKit
 
+protocol CreateTrackerViewControllerDelegate: AnyObject {
+    func chosenCategory(name: String)
+}
+
 final class CreateTrackerViewController: UIViewController {
+    weak var delegate: CreateTrackerViewControllerDelegate?
     private var trackerOptions: [String] = [] // Опции для отображение в UI, доступные пользователю для выбранного типа трекера (Например расписание)
     
     private var weekSchedule = [WeekDay]()
@@ -17,6 +22,7 @@ final class CreateTrackerViewController: UIViewController {
     
     private var selectedEmoji: [Int: String] = [:]
     private var selectedColor: [Int: UIColor] = [:]
+    private var categoryValue: String?
     
     private let screenScrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -164,7 +170,7 @@ final class CreateTrackerViewController: UIViewController {
     
     @objc
     private func createButtonTapped() {
-        let category = TrackerCategory(name: "Создаем новые категории", trackers: [])
+        let category = TrackerCategory(name: categoryValue ?? "Создаем новые категории", trackers: [])
         // ToDo: Функционал по добавлению кастомных категорий
         let trackerName = trackerNameTextField.text ?? ""
         
@@ -216,6 +222,15 @@ extension CreateTrackerViewController: UITableViewDataSource {
         let cellName = trackerOptions[indexPath.row]
         let cellAdditionalUIElement = CellElement.arrowImageView
         cell.configCell(nameLabel: cellName, element: cellAdditionalUIElement, indexPath: indexPath)
+        
+        switch indexPath.row {
+        case 0:
+            if categoryValue != nil {
+             cell.addValueToCellLabel(text: categoryValue ?? "")
+         }
+        default:
+            break
+        }
         return cell
     }
 }
@@ -236,7 +251,12 @@ extension CreateTrackerViewController: UITableViewDelegate {
             let model = CategoriesModel()
             let viewModel = CategoriesListViewModel(model: model)
             let vc = CategoriesListViewController(viewModel: viewModel)
+            self.delegate = vc
             vc.bind()
+            vc.delegate = self
+            if let value = categoryValue {
+                delegate?.chosenCategory(name: value)
+            }
             present(vc, animated: true)
         } else {
             // ToDo: реализовать выбор расписания
@@ -387,5 +407,14 @@ extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
         default:
             print("-------default---------\(indexPath.section)")
         }
+    }
+}
+
+// MARK: - CategoriesListViewControllerDelegate
+
+extension CreateTrackerViewController: CategoriesListViewControllerDelegate {
+    func categoryIsChosen(categoryName: String) {
+        categoryValue = categoryName
+        trackerOptionsTableView.reloadData()
     }
 }

@@ -12,7 +12,6 @@ final class CategoryCell: UITableViewCell {
     
     private let selectedImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = Images.selectedImage
         return imageView
     }()
     
@@ -21,7 +20,7 @@ final class CategoryCell: UITableViewCell {
         label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         return label
     }()
-
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.backgroundColor = UIColor(red: 0.9, green: 0.91, blue: 0.92, alpha: 0.3)
@@ -32,8 +31,22 @@ final class CategoryCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configCell(nameLabel: String) {
+    func configCell(nameLabel: String, isSelected: Bool?) {
         self.cellNameLabel.text = nameLabel
+        guard let isSelected = isSelected else { return }
+        if isSelected {
+            selectedImage.image = Images.selectedImage
+        } else {
+            selectedImage.image = nil
+        }
+    }
+    
+    func categorySelection(isSeleted: Bool) {
+        if isSelected {
+            selectedImage.image = Images.selectedImage
+        } else {
+            selectedImage.image = nil
+        }
     }
     
     private func setupViews() {

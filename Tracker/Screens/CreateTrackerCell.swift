@@ -33,6 +33,20 @@ final class CreateTrackerCell: UITableViewCell {
         return label
     }()
     
+    private var cellValueLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 17, weight: .regular)
+        label.textColor = .gray
+        return label
+    }()
+    
+    private let cellStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.spacing = 2
+        stackView.axis = .vertical
+        return stackView
+    }()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.backgroundColor = UIColor(red: 0.9, green: 0.91, blue: 0.92, alpha: 0.3)
@@ -75,12 +89,19 @@ final class CreateTrackerCell: UITableViewCell {
         }
     }
     
+    func addValueToCellLabel(text: String) {
+        cellValueLabel.text = text
+    }
+    
     private func setupViews() {
-        contentView.addViewsWithNoTAMIC(cellNameLabel)
+        cellStackView.addArrangedSubview(cellNameLabel)
+        cellStackView.addArrangedSubview(cellValueLabel)
+        contentView.addViewsWithNoTAMIC(cellStackView)
         
         NSLayoutConstraint.activate([
-            cellNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            cellNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            cellStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            cellStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            cellStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
         ])
     }
     
