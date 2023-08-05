@@ -51,10 +51,8 @@ extension TrackerStore: TrackerStoreProtocol {
             fatalError("Error with scheduleString")
         }
         
-        let weekdaysString = "2, 4, 6"
-
         // Разделим строку на отдельные числа, используя разделитель
-        let numbersArray = weekdaysString.components(separatedBy: ", ")
+        let numbersArray = scheduleString.components(separatedBy: ", ")
 
         // Преобразуйте каждое число в элемент перечисления WeekDay
         let schedule: [WeekDay] = numbersArray.compactMap { numberString in

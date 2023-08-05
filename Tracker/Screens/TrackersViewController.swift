@@ -43,8 +43,8 @@ final class TrackersViewController: UIViewController {
     
     init() {
         self.dataProvider = DataProvider(trackerStore: TrackerStore(),
-                                         trackerCategoryStore: TrackerCategoryStore(),
                                          trackerRecordsStore: TrackerRecordStore(delegate: nil),
+                                         trackerCategoryStore: TrackerCategoryStore(),
                                          delegate: nil)
         self.currentDate = Date()
         super.init(nibName: nil, bundle: nil)
