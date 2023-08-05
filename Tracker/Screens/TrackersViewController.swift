@@ -42,7 +42,7 @@ final class TrackersViewController: UIViewController {
     )
     
     init() {
-        self.dataProvider = DataProvider(trackerStore: TrackerStore(),
+        dataProvider = DataProvider(trackerStore: TrackerStore(),
                                          trackerRecordsStore: TrackerRecordStore(delegate: nil),
                                          trackerCategoryStore: TrackerCategoryStore(),
                                          delegate: nil)

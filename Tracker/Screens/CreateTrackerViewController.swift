@@ -225,9 +225,7 @@ extension CreateTrackerViewController: UITableViewDataSource {
         
         switch indexPath.row {
         case 0:
-            if categoryValue != nil {
              cell.addValueToCellLabel(text: categoryValue ?? "")
-         }
         default:
             break
         }

@@ -34,19 +34,11 @@ final class CategoryCell: UITableViewCell {
     func configCell(nameLabel: String, isSelected: Bool?) {
         self.cellNameLabel.text = nameLabel
         guard let isSelected = isSelected else { return }
-        if isSelected {
-            selectedImage.image = Images.selectedImage
-        } else {
-            selectedImage.image = nil
-        }
+        categorySelection(isSeleted: isSelected)
     }
     
     func categorySelection(isSeleted: Bool) {
-        if isSelected {
-            selectedImage.image = Images.selectedImage
-        } else {
-            selectedImage.image = nil
-        }
+        selectedImage.image = isSelected ? Images.selectedImage : nil
     }
     
     private func setupViews() {

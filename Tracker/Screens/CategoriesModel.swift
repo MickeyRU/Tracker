@@ -10,10 +10,6 @@ import Foundation
 final class CategoriesModel {
     private let categoryStore = TrackerCategoryStore()
     
-    func saveCategoriesToCoreData(category: Category) {
-        // Метод для сохранения данных в Core Data (вызывать метод TrackerCategoryStore)
-    }
-    
     func loadCategoriesFromCoreData() -> [Category] {
         return categoryStore.categories.compactMap {
             guard

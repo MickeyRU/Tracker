@@ -69,7 +69,6 @@ final class CategoriesListViewController: UIViewController {
         let viewModel = NewCategoryViewModel(model: model)
         let destinationVC = NewCategoryViewController(viewModel: viewModel)
         destinationVC.delegate = self
-        destinationVC.bind()
         present(destinationVC, animated: true)
     }
     
@@ -110,11 +109,7 @@ final class CategoriesListViewController: UIViewController {
     }
     
     private func checkCategoryList() {
-        if viewModel.categories.count == 0 {
-            placeholderView.isHidden = false
-        } else {
-            placeholderView.isHidden = true
-        }
+        placeholderView.isHidden = viewModel.categories.count != 0
     }
 }
     
@@ -127,11 +122,7 @@ final class CategoriesListViewController: UIViewController {
         func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reuseIdentifier) as? CategoryCell else { return UITableViewCell() }
             let cellName = viewModel.categories[indexPath.row].name
-            var isSelected = false
-            if cellName == chosenCategoryName {
-                isSelected = true
-            }
-            cell.configCell(nameLabel: cellName, isSelected: isSelected)
+            cell.configCell(nameLabel: cellName, isSelected: cellName == chosenCategoryName)
             cell.selectionStyle = .none
             return cell
         }
