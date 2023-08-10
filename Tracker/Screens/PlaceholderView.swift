@@ -6,6 +6,7 @@
 //
 
 import UIKit
+
 final class PlaceholderView: UIView {
     private let emptyOnScreenLabel: UILabel = {
         let label = UILabel()

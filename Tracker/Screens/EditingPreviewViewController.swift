@@ -8,7 +8,6 @@
 import UIKit
 
 final class EditingPreviewViewController: UIViewController {
-    
     private var previewSize: CGSize? {
         didSet {
             if let size = previewSize {
