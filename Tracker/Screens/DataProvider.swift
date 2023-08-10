@@ -25,6 +25,7 @@ protocol DataProviderProtocol: AnyObject {
     func addTracker(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws
     func getTrackerCoreData(indexPath: IndexPath) -> TrackerCoreData
     func getTrackerObject(indexPath: IndexPath) -> Tracker?
+    func togglePinForTracker(indexPath: IndexPath) throws
     
     func addNewTrackerRecord(trackerRecord: TrackerRecord, trackerCoreData: TrackerCoreData) throws
     func deleteRecord(date: Date, trackerID: String) throws
@@ -108,7 +109,7 @@ extension DataProvider: DataProviderProtocol {
     
     func addTracker(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws {
         do {
-            try trackerStore.add(tracker: tracker, trackerCategoryCoreData: trackerCategoryCoreData)
+            try trackerStore.addTracker(tracker: tracker, trackerCategoryCoreData: trackerCategoryCoreData)
         } catch {
             fatalError("Failed to addTracker: \(error)")
         }
@@ -116,12 +117,22 @@ extension DataProvider: DataProviderProtocol {
     
     func getTrackerObject(indexPath: IndexPath) -> Tracker? {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
-        guard let tracker = try? trackerStore.tracker(from: trackerCoreData) else { return nil }
+        guard let tracker = try? trackerStore.getTracker(from: trackerCoreData) else { return nil }
         return tracker
     }
     
     func getTrackerCoreData(indexPath: IndexPath) -> TrackerCoreData {
         fetchedResultsController.object(at: indexPath)
+    }
+    
+    func togglePinForTracker(indexPath: IndexPath) {
+        let trackerCoreDataToToggle = getTrackerCoreData(indexPath: indexPath)
+        trackerCoreDataToToggle.isPinned.toggle()
+        do {
+            try context.save()
+        } catch {
+            fatalError("Failed to togglePinForTracker: \(error)")
+        }
     }
     
     func addNewTrackerRecord(trackerRecord: TrackerRecord, trackerCoreData: TrackerCoreData) throws {

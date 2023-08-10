@@ -79,7 +79,6 @@ final class TrackersViewController: UIViewController {
         do {
             try dataProvider.addFiltersForFetchResultController(searchText: searchText ?? "", date: currentDate)
         } catch {
-            //TODO: show alert
             print(error.localizedDescription)
         }
         trackersCollectionView.reloadData()
@@ -232,57 +231,53 @@ extension TrackersViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView,
                         contextMenuConfigurationForItemAt indexPath: IndexPath,
                         point: CGPoint) -> UIContextMenuConfiguration? {
-        configurateContextMenu(index: indexPath)
+        configurateContextMenu(indexPath: indexPath)
     }
     
-    private func configurateContextMenu(index: IndexPath) -> UIContextMenuConfiguration {
-        let identifier = "\(index)" as NSString
+    private func configurateContextMenu(indexPath: IndexPath) -> UIContextMenuConfiguration {
+        let identifier = "\(indexPath)" as NSString
+        guard let tracker = self.dataProvider.getTrackerObject(indexPath: indexPath) else { return UIContextMenuConfiguration() }
+
         
         return UIContextMenuConfiguration(identifier: identifier,
                                           previewProvider: { [weak self] in
             guard let self = self else { return UIViewController() }
             let previewVC = EditingPreviewViewController()
-            guard let tracker = self.dataProvider.getTrackerObject(indexPath: index) else { return previewVC }
             let cellSize = CGSize(width: Int((trackersCollectionView.bounds.width - self.params.paddingWidth)) / params.cellCount, height: 88)
             previewVC.configureView(sizeForPreview: cellSize, tracker: tracker)
             return previewVC
         },
                                           actionProvider: { [weak self] _ in
             guard let self = self else { return UIMenu() }
-            let togglePinAction: UIAction
-            if self.isItemPinned(at: index.row) {
-                togglePinAction = UIAction(title: "Открепить") { _ in
-                    self.unpinItem(at: index.row)
-                }
-            } else {
-                togglePinAction = UIAction(title: "Закрепить") { _ in
-                    self.pinItem(at: index.row)
-                }
+            let togglePinAction = UIAction(title: tracker.isPinned ? "Открепить" : "Закрепить") { [weak self] _ in
+                guard let self = self else { return }
+                self.togglePin(indexPath: indexPath)
             }
             
+            
             let editAction = UIAction(title: "Редактировать") { _ in
-                self.editItem(at: index.row)
+                self.editItem(at: indexPath.row)
             }
             
             let deleteAction = UIAction(title: "Удалить", attributes: .destructive) { _ in
-                self.deleteItem(at: index.row)
+                self.deleteItem(at: indexPath.row)
             }
             
             return UIMenu(title: "", children: [togglePinAction, editAction, deleteAction])
         })
     }
     
-    private func isItemPinned(at index: Int) -> Bool {
-        // Ваша логика для проверки, закреплен ли элемент
-        return false // Заглушка
+    private func isTrackerPinned(at indexPath: IndexPath) -> Bool {
+        guard let isPinned = dataProvider.getTrackerObject(indexPath: indexPath)?.isPinned else { return false }
+        return isPinned
     }
     
-    private func pinItem(at index: Int) {
-        // Ваша логика для закрепления элемента
-    }
-    
-    private func unpinItem(at index: Int) {
-        // Ваша логика для открепления элемента
+    private func togglePin(indexPath: IndexPath) {
+        do {
+            try dataProvider.togglePinForTracker(indexPath: indexPath)
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     private func editItem(at index: Int) {

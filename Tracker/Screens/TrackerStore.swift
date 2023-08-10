@@ -9,8 +9,8 @@ import UIKit
 import CoreData
 
 protocol TrackerStoreProtocol: AnyObject {
-    func add(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws
-    func tracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
+    func addTracker(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws
+    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
 }
 
 final class TrackerStore: NSObject {
@@ -22,7 +22,7 @@ final class TrackerStore: NSObject {
 }
 
 extension TrackerStore: TrackerStoreProtocol {
-    func add(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws {
+    func addTracker(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws {
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.id = tracker.id.uuidString
         trackerCoreData.name = tracker.name
@@ -31,10 +31,11 @@ extension TrackerStore: TrackerStoreProtocol {
         let scheduleString = tracker.schedule.map { $0.numberValue }
         trackerCoreData.schedule = scheduleString.map(String.init).joined(separator: ", ")
         trackerCoreData.category = trackerCategoryCoreData
+        trackerCoreData.isPinned = tracker.isPinned
         try context.save()
     }
     
-    func tracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
+    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
         guard let emojies = trackerCoreData.emoji else {
             fatalError("Error with emoji")
         }
@@ -67,6 +68,8 @@ extension TrackerStore: TrackerStoreProtocol {
                        name: name,
                        color: UIColor.color(fromHex: colorHex),
                        emoji: emojies,
-                       schedule: schedule)
+                       schedule: schedule,
+                       isPinned: trackerCoreData.isPinned)
     }
+    
 }

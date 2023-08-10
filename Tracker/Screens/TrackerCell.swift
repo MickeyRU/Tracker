@@ -54,6 +54,12 @@ final class TrackerCell: UICollectionViewCell {
         return button
     }()
     
+    private var pinnedImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = Images.pinnedTrackerImage
+        return imageView
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -64,6 +70,8 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     func configCell(tracker: Tracker, isCompletedToday: Bool,  indexPath: IndexPath, completedDays: Int) {
+        layer.cornerRadius = 16
+        
         self.trackerId = tracker.id
         self.isCompletedToday = isCompletedToday
         self.indexPath = indexPath
@@ -72,6 +80,7 @@ final class TrackerCell: UICollectionViewCell {
         self.trackerTextLabel.text = tracker.name
         self.backGroundViewColor.backgroundColor = tracker.color
         self.trackButton.tintColor = tracker.color
+        self.pinnedImageView.isHidden = tracker.isPinned ? false : true
         updateDayCountLabelAndButton(completedDays: completedDays)
     }
     
@@ -85,7 +94,7 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func setupViews() {
-        [backGroundViewColor, emojiLabel, trackerTextLabel, trackButton, completedDaysLabel].forEach { contentView.addViewsWithNoTAMIC($0) }
+        [backGroundViewColor, emojiLabel, trackerTextLabel, trackButton, completedDaysLabel, pinnedImageView].forEach { contentView.addViewsWithNoTAMIC($0) }
         
         NSLayoutConstraint.activate([
             backGroundViewColor.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -109,7 +118,10 @@ final class TrackerCell: UICollectionViewCell {
             
             completedDaysLabel.topAnchor.constraint(equalTo: backGroundViewColor.bottomAnchor, constant: 16),
             completedDaysLabel.leadingAnchor.constraint(equalTo: trackerTextLabel.leadingAnchor),
-            completedDaysLabel.trailingAnchor.constraint(equalTo: trackButton.leadingAnchor, constant: -8)
+            completedDaysLabel.trailingAnchor.constraint(equalTo: trackButton.leadingAnchor, constant: -8),
+            
+            pinnedImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            pinnedImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4)
         ])
     }
     

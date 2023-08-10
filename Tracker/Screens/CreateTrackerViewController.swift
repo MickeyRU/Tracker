@@ -196,7 +196,8 @@ final class CreateTrackerViewController: UIViewController {
                                  name: trackerName,
                                  color: color ?? UIColor.randomColor,
                                  emoji: emoji ?? "🔥",
-                                 schedule: scheduleForNewTracker)
+                                 schedule: scheduleForNewTracker,
+                                 isPinned: false)
         // Собираем словарь для передачи через нотификацию на главный экран
         let userInfo: [String: Any] = [
             "Category": category,

@@ -19,4 +19,6 @@ struct Images {
     
     static let onBoardingRedImage = UIImage(named: "red")
     static let onBoardingBlueImage = UIImage(named: "blue")
+    
+    static let pinnedTrackerImage = UIImage(named: "pinnedTrackerImage")
 }
