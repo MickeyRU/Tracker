@@ -153,8 +153,7 @@ final class TrackersViewController: UIViewController {
                     categoryCoreData = existingCategory
                 } else {
                     do {
-                        let newCategory = try self.dataProvider.createCategory(category: TrackerCategory(name: category.name,
-                                                                                                         trackers: []))
+                        let newCategory = try self.dataProvider.createCategory(category: TrackerCategory(name: category.name, trackers: []))
                         categoryCoreData = newCategory
                     } catch {
                         print(error.localizedDescription)

@@ -47,7 +47,9 @@ final class DataProvider: NSObject {
     
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
         let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
-        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCategoryCoreData.name, ascending: false)]
+        
+        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCoreData.category?.priority, ascending: false),
+                                        NSSortDescriptor(keyPath: \TrackerCoreData.category?.name, ascending: false)]
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
                                                                   managedObjectContext: context,
@@ -128,6 +130,29 @@ extension DataProvider: DataProviderProtocol {
     func togglePinForTracker(indexPath: IndexPath) {
         let trackerCoreDataToToggle = getTrackerCoreData(indexPath: indexPath)
         trackerCoreDataToToggle.isPinned.toggle()
+        
+        if trackerCoreDataToToggle.isPinned {
+            trackerCoreDataToToggle.previousCategory = trackerCoreDataToToggle.category?.name
+            if let existedCategoryCoreData = fetchCategory(name: "Закрепленные") {
+                trackerCoreDataToToggle.category = existedCategoryCoreData
+            } else {
+                let newPinnedCategory = TrackerCategory(name: "Закрепленные", trackers: [])
+                do {
+                    let newPinnedCategoryCoreData = try createCategory(category: newPinnedCategory)
+                    newPinnedCategoryCoreData.priority = 1
+                    trackerCoreDataToToggle.category = newPinnedCategoryCoreData
+                } catch {
+                    fatalError("Failed to togglePinForTracker: \(error)")
+                }
+            }
+        } else {
+            guard
+                let previousCategory = trackerCoreDataToToggle.previousCategory,
+                let previousCategoryCoreData = fetchCategory(name: previousCategory)
+            else { return }
+            trackerCoreDataToToggle.category = previousCategoryCoreData
+            trackerCoreDataToToggle.previousCategory = nil
+        }
         do {
             try context.save()
         } catch {
