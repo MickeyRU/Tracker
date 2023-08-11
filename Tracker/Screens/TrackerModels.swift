@@ -54,6 +54,25 @@ enum WeekDay: CaseIterable {
         }
     }
     
+    var shortDayName: String {
+        switch self {
+        case .sunday:
+            return "Вс"
+        case .monday:
+            return "Пн"
+        case .tuesday:
+            return "Вт"
+        case .wednesday:
+            return "Ср"
+        case .thursday:
+            return "Чт"
+        case .friday:
+            return "Пт"
+        case .saturday:
+            return "Сб"
+        }
+    }
+    
     static func getWeekDayInNumber(for date: Date) -> String {
         String(Calendar.current.component(.weekday, from: date))
     }
@@ -77,4 +96,10 @@ struct TrackerCategory {
 struct TrackerRecord: Hashable {
     let trackerID: UUID
     let date: Date
+}
+
+extension Array where Element == WeekDay {
+    func shortDaysToString() -> String {
+        self.map { $0.shortDayName }.joined(separator: ", ")
+    }
 }

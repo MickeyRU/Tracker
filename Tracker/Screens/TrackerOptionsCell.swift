@@ -16,8 +16,8 @@ enum CellElement {
     case daySelectionSwitch
 }
 
-final class CreateTrackerCell: UITableViewCell {
-    static let reuseIdentifier = "CreateTrackerCell:"
+final class TrackerOptionsCell: UITableViewCell {
+    static let reuseIdentifier = "TrackerOptionsCell"
 
     weak var delegate: SwitcherProtocolDelegate?
     
@@ -89,7 +89,7 @@ final class CreateTrackerCell: UITableViewCell {
         }
     }
     
-    func addValueToCellLabel(text: String) {
+    func addChoosenOptionTitle(text: String) {
         cellValueLabel.text = text
     }
     

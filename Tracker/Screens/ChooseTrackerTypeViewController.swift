@@ -46,10 +46,8 @@ final class ChooseTrackerTypeViewController: UIViewController {
     }
     
     private func presentCreateViewController(trackerName: String, category: [String]) {
-        let createTrackerViewController = CreateTrackerViewController()
+        let createTrackerViewController = CreateTrackerViewController(mode: .create(trackerName, category))
         createTrackerViewController.modalPresentationStyle = .formSheet
-        let optionsArray = category
-        createTrackerViewController.configTitleAndOptions(trackerName, optionsArray)
         present(createTrackerViewController, animated: true)
     }
 

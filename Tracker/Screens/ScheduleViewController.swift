@@ -71,7 +71,7 @@ final class ScheduleViewController: UIViewController {
     private func setupTableView() {
         daysOfWeekTableView.dataSource = self
         daysOfWeekTableView.delegate = self
-        daysOfWeekTableView.register(CreateTrackerCell.self, forCellReuseIdentifier: CreateTrackerCell.reuseIdentifier)
+        daysOfWeekTableView.register(TrackerOptionsCell.self, forCellReuseIdentifier: TrackerOptionsCell.reuseIdentifier)
         daysOfWeekTableView.layer.cornerRadius = 16
     }
     
@@ -90,7 +90,7 @@ extension ScheduleViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: CreateTrackerCell.reuseIdentifier, for: indexPath) as? CreateTrackerCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: TrackerOptionsCell.reuseIdentifier, for: indexPath) as? TrackerOptionsCell else {
             return UITableViewCell()
         }
         cell.delegate = self

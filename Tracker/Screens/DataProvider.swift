@@ -15,15 +15,17 @@ protocol DataProviderDelegate: AnyObject {
 protocol DataProviderProtocol: AnyObject {
     var numberOfSections: Int { get }
     var numberOfTrackers: Int { get }
-
+    
     func numberOfRowsInSection(section: Int) -> Int
     func nameOfSection(section: Int) -> String
     
     func fetchCategory(name: String) -> TrackerCategoryCoreData?
     func createCategory(category: TrackerCategory) throws -> TrackerCategoryCoreData
     
+    func fetchTracker(id: String) -> TrackerCoreData?
     func addTracker(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws
     func getTrackerCoreData(indexPath: IndexPath) -> TrackerCoreData
+    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
     func getTrackerObject(indexPath: IndexPath) -> Tracker?
     func togglePinForTracker(indexPath: IndexPath) throws
     
@@ -31,6 +33,7 @@ protocol DataProviderProtocol: AnyObject {
     func deleteRecord(date: Date, trackerID: String) throws
     func countRecordForTracker(trackerID: String) -> Int
     func trackerTrackedToday(date: Date, trackerID: String) -> Bool
+    func updateTracker(trackerCoreData: TrackerCoreData, trackerCategoryCoreData: TrackerCategoryCoreData) throws
     
     func addFiltersForFetchResultController(searchText: String, date: Date) throws
     
@@ -86,7 +89,7 @@ extension DataProvider: DataProviderProtocol {
     var numberOfTrackers: Int {
         fetchedResultsController.fetchedObjects?.count ?? 0
     }
-
+    
     
     func numberOfRowsInSection(section: Int) -> Int {
         fetchedResultsController.sections?[section].numberOfObjects ?? 0
@@ -98,6 +101,10 @@ extension DataProvider: DataProviderProtocol {
     
     func fetchCategory(name: String) -> TrackerCategoryCoreData? {
         trackerCategoryStore.fetchCategory(name: name)
+    }
+    
+    func fetchTracker(id: String) -> TrackerCoreData? {
+        trackerStore.fetchTracker(id: id)
     }
     
     func createCategory(category: TrackerCategory) throws -> TrackerCategoryCoreData {
@@ -123,8 +130,25 @@ extension DataProvider: DataProviderProtocol {
         return tracker
     }
     
+    func updateTracker(trackerCoreData: TrackerCoreData, trackerCategoryCoreData: TrackerCategoryCoreData) throws {
+        do {
+            try trackerStore.updateTracker(trackerCoreData: trackerCoreData, trackerCategoryCoreData: trackerCategoryCoreData)
+        } catch {
+            fatalError("Failed to addTracker: \(error)")
+        }
+    }
+    
     func getTrackerCoreData(indexPath: IndexPath) -> TrackerCoreData {
         fetchedResultsController.object(at: indexPath)
+    }
+    
+    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
+        do {
+            let tracker = try trackerStore.getTracker(from: trackerCoreData)
+            return tracker
+        } catch {
+            fatalError("Failed to addTracker: \(error)")
+        }
     }
     
     func togglePinForTracker(indexPath: IndexPath) {
@@ -186,7 +210,7 @@ extension DataProvider: DataProviderProtocol {
     
     func addFiltersForFetchResultController(searchText: String, date: Date) throws {
         let dayNumber = WeekDay.getWeekDayInNumber(for: date)
-
+        
         var predicates: [NSPredicate] = []
         let predicateForDate = NSPredicate(format: "%K CONTAINS[n] %@",
                                            #keyPath(TrackerCoreData.schedule), dayNumber)

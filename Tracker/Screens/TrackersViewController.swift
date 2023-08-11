@@ -69,6 +69,7 @@ final class TrackersViewController: UIViewController {
         setupViews()
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleNewTrackerNotification(_:)), name: Notification.Name("NewTrackerNotification"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleEditTrackerNotification(_:)), name: Notification.Name("EditTrackerNotification"), object: nil)
     }
     
     private func updateDate() {
@@ -172,6 +173,50 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc
+    private func handleEditTrackerNotification (_ notification: Notification) {
+        if let userInfo = notification.userInfo {
+            // Проверяем что в юзеринфо есть два объекта - категория и трекер
+            if let category = userInfo["Category"] as? TrackerCategory,
+               let tracker = userInfo["NewTracker"] as? Tracker {
+                // Работаем с категорией в кор дате
+                var categoryCoreData: TrackerCategoryCoreData?
+                if let existedCategory = self.dataProvider.fetchCategory(name: category.name) {
+                    categoryCoreData = existedCategory
+                } else {
+                    do {
+                        let newCategory = try self.dataProvider.createCategory(category: TrackerCategory(name: category.name, trackers: []))
+                        categoryCoreData = newCategory
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
+                // Работаем с трекером в кор дате - по аналогии с категорией
+                guard let categoryCoreData = categoryCoreData else { return }
+                var updatedTrackerCoreData: TrackerCoreData?
+                
+                if let existedTrackerCoreData = self.dataProvider.fetchTracker(id: tracker.id.uuidString) {
+                    updatedTrackerCoreData = existedTrackerCoreData
+                }
+                guard let updatedTrackerCoreData = updatedTrackerCoreData else { return }
+                updatedTrackerCoreData.trackerID = tracker.id.uuidString
+                updatedTrackerCoreData.name = tracker.name
+                updatedTrackerCoreData.colorHex = UIColor.hexString(from: tracker.color)
+                updatedTrackerCoreData.emoji = tracker.emoji
+                let scheduleString = tracker.schedule.map { $0.numberValue }
+                updatedTrackerCoreData.schedule = scheduleString.map(String.init).joined(separator: ", ")
+                updatedTrackerCoreData.isPinned = tracker.isPinned
+                
+                do {
+                    try dataProvider.updateTracker(trackerCoreData: updatedTrackerCoreData, trackerCategoryCoreData: categoryCoreData)
+                } catch {
+                    print(error.localizedDescription)
+                }
+            }
+            reloadData(searchText: searchTextField.text)
+        }
+    }
+    
+    @objc
     private func dateChanged() {
         updateDate()
         reloadData(searchText: searchTextField.text)
@@ -255,11 +300,11 @@ extension TrackersViewController: UICollectionViewDelegate {
             
             
             let editAction = UIAction(title: "Редактировать") { _ in
-                self.editItem(at: indexPath.row)
+                self.editItem(tracker: tracker)
             }
             
             let deleteAction = UIAction(title: "Удалить", attributes: .destructive) { _ in
-                self.deleteItem(at: indexPath.row)
+                self.deleteItem(indexPath: indexPath)
             }
             
             return UIMenu(title: "", children: [togglePinAction, editAction, deleteAction])
@@ -279,11 +324,14 @@ extension TrackersViewController: UICollectionViewDelegate {
         }
     }
     
-    private func editItem(at index: Int) {
-        // Ваша логика для редактирования элемента
+    private func editItem(tracker: Tracker) {
+        let optionsArray = ["Категория", "Расписание"]
+        let editViewController = CreateTrackerViewController(mode: .edit(tracker, optionsArray))
+        editViewController.modalPresentationStyle = .formSheet
+        present(editViewController, animated: true)
     }
     
-    private func deleteItem(at index: Int) {
+    private func deleteItem(indexPath: IndexPath) {
         // Ваша логика для удаления элемента
     }
 }
