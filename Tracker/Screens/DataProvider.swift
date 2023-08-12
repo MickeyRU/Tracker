@@ -27,6 +27,7 @@ protocol DataProviderProtocol: AnyObject {
     func getTrackerCoreData(indexPath: IndexPath) -> TrackerCoreData
     func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
     func getTrackerObject(indexPath: IndexPath) -> Tracker?
+    func getTrackerCategoryName(indexPath: IndexPath) -> String 
     func togglePinForTracker(indexPath: IndexPath) throws
     
     func addNewTrackerRecord(trackerRecord: TrackerRecord, trackerCoreData: TrackerCoreData) throws
@@ -128,6 +129,12 @@ extension DataProvider: DataProviderProtocol {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
         guard let tracker = try? trackerStore.getTracker(from: trackerCoreData) else { return nil }
         return tracker
+    }
+    
+    func getTrackerCategoryName(indexPath: IndexPath) -> String {
+        let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        guard let categoryName = trackerCoreData.category?.name else { return "" }
+        return categoryName
     }
     
     func updateTracker(trackerCoreData: TrackerCoreData, trackerCategoryCoreData: TrackerCategoryCoreData) throws {

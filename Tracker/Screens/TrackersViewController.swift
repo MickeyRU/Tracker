@@ -190,7 +190,7 @@ final class TrackersViewController: UIViewController {
                         print(error.localizedDescription)
                     }
                 }
-                // Работаем с трекером в кор дате - по аналогии с категорией
+                // Работаем с трекером в кор дате
                 guard let categoryCoreData = categoryCoreData else { return }
                 var updatedTrackerCoreData: TrackerCoreData?
                 
@@ -300,7 +300,8 @@ extension TrackersViewController: UICollectionViewDelegate {
             
             
             let editAction = UIAction(title: "Редактировать") { _ in
-                self.editItem(tracker: tracker)
+                let categoryName = self.dataProvider.getTrackerCategoryName(indexPath: indexPath)
+                self.editItem(tracker: tracker, categoryName: categoryName)
             }
             
             let deleteAction = UIAction(title: "Удалить", attributes: .destructive) { _ in
@@ -324,9 +325,9 @@ extension TrackersViewController: UICollectionViewDelegate {
         }
     }
     
-    private func editItem(tracker: Tracker) {
+    private func editItem(tracker: Tracker, categoryName: String) {
         let optionsArray = ["Категория", "Расписание"]
-        let editViewController = CreateTrackerViewController(mode: .edit(tracker, optionsArray))
+        let editViewController = CreateTrackerViewController(mode: .edit(tracker, categoryName, optionsArray))
         editViewController.modalPresentationStyle = .formSheet
         present(editViewController, animated: true)
     }

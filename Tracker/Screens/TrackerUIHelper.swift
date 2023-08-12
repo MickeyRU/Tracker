@@ -9,7 +9,7 @@ import UIKit
 
 enum TrackerViewControllerMode {
     case create(String, [String])
-    case edit(Tracker, [String])
+    case edit(Tracker, String, [String])
 }
 
 final class TrackerUIHelper {

@@ -58,9 +58,6 @@ final class TrackerOptionsCell: UITableViewCell {
     }
     
     func configCell(nameLabel: String, element: CellElement, indexPath: IndexPath) {
-        self.cellNameLabel.text = nameLabel
-        self.indexPath = indexPath
-        
         // В зависимости от входного элемента настраиваем нужный UI элемент для экрана.
         switch element {
         case .arrowImageView:
@@ -87,6 +84,9 @@ final class TrackerOptionsCell: UITableViewCell {
                 ])
             }
         }
+        
+        self.cellNameLabel.text = nameLabel
+        self.indexPath = indexPath
     }
     
     func addChoosenOptionTitle(text: String) {

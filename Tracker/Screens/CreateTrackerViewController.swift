@@ -14,13 +14,12 @@ protocol CreateTrackerViewControllerDelegate: AnyObject {
 final class CreateTrackerViewController: UIViewController {
     weak var delegate: CreateTrackerViewControllerDelegate?
     
-    private var trackerOptions: [String] = [] // Опции для отображение в UI, доступные пользователю для выбранного типа трекера (Например расписание)
-    private var weekSchedule = [WeekDay]()
     private let emojiArray = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪"]
     private let mode: TrackerViewControllerMode
+    
+    private var trackerOptions: [String] = [] // Опции для отображение в UI, доступные пользователю для выбранного типа трекера (Например расписание или категория)
+    private var weekSchedule: [WeekDay] = []
     private var trackerForEditing: Tracker?
-    
-    
     private var selectedEmoji: [Int: String] = [:]
     private var selectedColor: [Int: UIColor] = [:]
     private var categoryValue: String?
@@ -85,10 +84,12 @@ final class CreateTrackerViewController: UIViewController {
             configContent(title, options, isEdit: true)
             isEditingViewController = false
             
-        case .edit(let tracker, let options):
-            configContent(tracker.name, options, isEdit: false)
+        case .edit(let tracker, let categoryName, let options):
+            configContent("Редактирование привычки", options, isEdit: false)
+            trackerNameTextField.text = tracker.name
             trackerForEditing = tracker
-
+            categoryValue = categoryName
+            weekSchedule = tracker.schedule
             isEditingViewController = true
         }
         
