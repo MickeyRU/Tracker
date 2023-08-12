@@ -1,7 +1,7 @@
 import UIKit
 
 final class FilterViewController: UIViewController {
-    private let filters = ["Все трекеры", "Трекеры на сегодня", "Завешенные", "Не завршенные"]
+    private let filters = ["Все трекеры", "Трекеры на сегодня", "Завешенные", "Не завершенные"]
 
     private let pageTitleLabel: UILabel = {
         let label = UILabel()

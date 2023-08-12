@@ -15,6 +15,8 @@ protocol TrackerCellDelegate: AnyObject {
 final class TrackerCell: UICollectionViewCell {
     static let reuseIdentifier = "TrackerCell"
     
+    private let analyticsService = AnalyticsService.shared
+    
     private var trackerId: UUID?
     private var indexPath: IndexPath?
     weak var delegate: TrackerCellDelegate?
@@ -143,6 +145,11 @@ final class TrackerCell: UICollectionViewCell {
     
     @objc
     private func trackButtonTapped() {
+        analyticsService.report(event: "click", params: [
+            "screen": "Main",
+            "item": "track"
+        ])
+        
         guard
             let trackerId = trackerId,
             let indexPath = indexPath

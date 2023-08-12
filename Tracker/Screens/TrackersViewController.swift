@@ -8,6 +8,7 @@
 import UIKit
 
 final class TrackersViewController: UIViewController {
+    private let analyticsService = AnalyticsService.shared
     private let dataProvider: DataProviderProtocol
     private var completedTrackers: [TrackerRecord] = []
     private var currentDate: Date
@@ -79,6 +80,16 @@ final class TrackersViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleNewTrackerNotification(_:)), name: Notification.Name("NewTrackerNotification"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleEditTrackerNotification(_:)), name: Notification.Name("EditTrackerNotification"), object: nil)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        analyticsService.report(event: "open", params: ["screen": "Main"])
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        analyticsService.report(event: "close", params: ["screen": "Main"])
     }
     
     private func updateDate() {
@@ -165,6 +176,12 @@ final class TrackersViewController: UIViewController {
     
     @objc
     private func filterButtonTapped() {
+        analyticsService.report(event: "click", params: [
+            "screen": "Main",
+            "item": "filter"
+        ])
+
+        
         let filterViewController = FilterViewController()
         present(filterViewController, animated: true)
     }
@@ -252,6 +269,11 @@ final class TrackersViewController: UIViewController {
     @objc
     private func addButtonTapped() {
         // Действия при нажатии кнопки "+"
+        analyticsService.report(event: "click", params: [
+            "screen": "Main",
+            "item": "add_track"
+        ])
+        
         let destinationViewController = ChooseTrackerTypeViewController()
         destinationViewController.modalPresentationStyle = .formSheet
         present(destinationViewController, animated: true)
@@ -320,18 +342,27 @@ extension TrackersViewController: UICollectionViewDelegate {
         },
                                           actionProvider: { [weak self] _ in
             guard let self = self else { return UIMenu() }
-            let togglePinAction = UIAction(title: tracker.isPinned ? "Открепить" : "Закрепить") { [weak self] _ in
-                guard let self = self else { return }
+            let togglePinAction = UIAction(title: tracker.isPinned ? "Открепить" : "Закрепить") { _ in
                 self.togglePin(indexPath: indexPath)
             }
             
             
             let editAction = UIAction(title: "Редактировать") { _ in
+                self.analyticsService.report(event: "click", params: [
+                    "screen": "Main",
+                    "item": "edit"
+                ])
+                
                 let categoryName = self.dataProvider.getTrackerCategoryName(indexPath: indexPath)
                 self.editItem(tracker: tracker, categoryName: categoryName)
             }
             
             let deleteAction = UIAction(title: "Удалить", attributes: .destructive) { _ in
+                self.analyticsService.report(event: "click", params: [
+                    "screen": "Main",
+                    "item": "delete"
+                ])
+                
                 self.deleteItem(at: indexPath)
             }
             
