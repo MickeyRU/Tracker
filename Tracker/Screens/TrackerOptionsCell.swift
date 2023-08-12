@@ -18,7 +18,7 @@ enum CellElement {
 
 final class TrackerOptionsCell: UITableViewCell {
     static let reuseIdentifier = "TrackerOptionsCell"
-
+    
     weak var delegate: SwitcherProtocolDelegate?
     
     private var isSwitchSelected = false
@@ -57,7 +57,7 @@ final class TrackerOptionsCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configCell(nameLabel: String, element: CellElement, indexPath: IndexPath) {
+    func configCell(nameLabel: String, element: CellElement, indexPath: IndexPath, isSelected: Bool?) {
         // В зависимости от входного элемента настраиваем нужный UI элемент для экрана.
         switch element {
         case .arrowImageView:
@@ -74,15 +74,17 @@ final class TrackerOptionsCell: UITableViewCell {
             }
         case .daySelectionSwitch:
             daySelectionSwitch = UISwitch()
-            daySelectionSwitch?.addTarget(self, action: #selector(switchValueDidChanged), for: .touchUpInside)
-            if let daySelectionSwitch = daySelectionSwitch {
-                contentView.addViewsWithNoTAMIC(daySelectionSwitch)
-                
-                NSLayoutConstraint.activate([
-                    daySelectionSwitch.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-                    daySelectionSwitch.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
-                ])
+            guard let daySelectionSwitch = daySelectionSwitch else { return }
+            if isSelected != nil {
+                daySelectionSwitch.isOn = true
             }
+            daySelectionSwitch.addTarget(self, action: #selector(switchValueDidChanged), for: .touchUpInside)
+            contentView.addViewsWithNoTAMIC(daySelectionSwitch)
+            
+            NSLayoutConstraint.activate([
+                daySelectionSwitch.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+                daySelectionSwitch.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
+            ])
         }
         
         self.cellNameLabel.text = nameLabel

@@ -234,7 +234,7 @@ extension CreateTrackerViewController: UITableViewDataSource {
         }
         let cellName = trackerOptions[indexPath.row]
         let cellAdditionalUIElement = CellElement.arrowImageView
-        cell.configCell(nameLabel: cellName, element: cellAdditionalUIElement, indexPath: indexPath)
+        cell.configCell(nameLabel: cellName, element: cellAdditionalUIElement, indexPath: indexPath, isSelected: nil)
         
         switch indexPath.row {
         case 0:
@@ -272,8 +272,7 @@ extension CreateTrackerViewController: UITableViewDelegate {
             }
             present(vc, animated: true)
         } else {
-            // ToDo: реализовать выбор расписания
-            let scheduleViewController = ScheduleViewController()
+            let scheduleViewController = ScheduleViewController(weekShedule: self.weekSchedule)
             scheduleViewController.delegate = self
             present(scheduleViewController, animated: true)
         }

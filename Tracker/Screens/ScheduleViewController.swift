@@ -41,6 +41,15 @@ final class ScheduleViewController: UIViewController {
         return button
     }()
     
+    init(weekShedule: [WeekDay]) {
+        self.weekSchedule = weekShedule
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+        
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -97,9 +106,11 @@ extension ScheduleViewController: UITableViewDataSource {
         
         let adjustedIndex = (indexPath.row + 1) % weekDays.count // Вычисляем индекс с учетом сдвига
         
-        let cellName = weekDays[adjustedIndex]
+        let day = weekDays[adjustedIndex]
         let cellAdditionalUIElement = CellElement.daySelectionSwitch
-        cell.configCell(nameLabel: cellName.dayName, element: cellAdditionalUIElement, indexPath: indexPath)
+        // Проверяем, содержится ли текущий день в массиве weekSchedule
+           let isSelected = weekSchedule.contains(day)
+        cell.configCell(nameLabel: day.dayName, element: cellAdditionalUIElement, indexPath: indexPath, isSelected:isSelected )
         return cell
     }
 }
@@ -118,6 +129,7 @@ extension ScheduleViewController: UITableViewDelegate {
 
 extension ScheduleViewController: SwitcherProtocolDelegate {
     func receiveSwitcherValue(isSelected: Bool, indexPath: IndexPath) {
+        weekSchedule.removeAll()
         let adjustedIndex = (indexPath.row + 1) % weekDays.count // Применяем сдвиг индекса
         
         let weekElement = weekDays[adjustedIndex]
