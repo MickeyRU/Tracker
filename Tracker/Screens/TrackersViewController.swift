@@ -62,7 +62,7 @@ final class TrackersViewController: UIViewController {
         updateDate()
         reloadData(searchText: nil)
         
-        view.backgroundColor = .white
+        view.backgroundColor = ColorsHelper.shared.viewBackgroundColor
         
         setupNavigationBar()
         setupCollectionView()
@@ -93,7 +93,14 @@ final class TrackersViewController: UIViewController {
         
         // Создание UIBarButtonItem с кнопкой "+"
         let addButton = UIBarButtonItem(image: Images.addTrackerButtonImage, style: .plain, target: self, action: #selector(addButtonTapped))
-        addButton.tintColor = .black
+        addButton.tintColor = UIColor { (traits: UITraitCollection) -> UIColor in
+            if traits.userInterfaceStyle == .light {
+                return UIColor.black
+            } else {
+                return UIColor.white
+            }
+        }
+        
         navigationItem.leftBarButtonItem = addButton
         
         // Создание UIBarButtonItem с UIDatePicker в качестве кастомного представления

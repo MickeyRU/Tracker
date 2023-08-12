@@ -9,6 +9,7 @@ import UIKit
 
 final class ColorsHelper {
     static let shared = ColorsHelper()
+    let viewBackgroundColor = UIColor.systemBackground
     
     let cellColors: [UIColor] = [
         UIColor(hex: 0xFD4C49),
