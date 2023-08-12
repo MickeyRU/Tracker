@@ -11,6 +11,7 @@ import CoreData
 protocol TrackerStoreProtocol: AnyObject {
     func fetchTracker(id: String) -> TrackerCoreData?
     func addTracker(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws
+    func deleteTracker(trackerCoreData: TrackerCoreData) throws
     func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
     func updateTracker(trackerCoreData: TrackerCoreData, trackerCategoryCoreData: TrackerCategoryCoreData) throws
 }
@@ -52,6 +53,11 @@ extension TrackerStore: TrackerStoreProtocol {
         trackerCoreData.schedule = scheduleString.map(String.init).joined(separator: ", ")
         trackerCoreData.category = trackerCategoryCoreData
         trackerCoreData.isPinned = tracker.isPinned
+        try context.save()
+    }
+    
+    func deleteTracker(trackerCoreData: TrackerCoreData) throws {
+        context.delete(trackerCoreData)
         try context.save()
     }
     

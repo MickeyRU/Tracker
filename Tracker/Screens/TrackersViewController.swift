@@ -281,7 +281,7 @@ extension TrackersViewController: UICollectionViewDelegate {
     private func configurateContextMenu(indexPath: IndexPath) -> UIContextMenuConfiguration {
         let identifier = "\(indexPath)" as NSString
         guard let tracker = self.dataProvider.getTrackerObject(indexPath: indexPath) else { return UIContextMenuConfiguration() }
-
+        
         
         return UIContextMenuConfiguration(identifier: identifier,
                                           previewProvider: { [weak self] in
@@ -305,7 +305,7 @@ extension TrackersViewController: UICollectionViewDelegate {
             }
             
             let deleteAction = UIAction(title: "Удалить", attributes: .destructive) { _ in
-                self.deleteItem(indexPath: indexPath)
+                self.deleteItem(at: indexPath)
             }
             
             return UIMenu(title: "", children: [togglePinAction, editAction, deleteAction])
@@ -332,8 +332,27 @@ extension TrackersViewController: UICollectionViewDelegate {
         present(editViewController, animated: true)
     }
     
-    private func deleteItem(indexPath: IndexPath) {
-        // Ваша логика для удаления элемента
+    private func deleteItem(at indexPath: IndexPath) {
+        let alertController = UIAlertController(title: "Уверены, что хотите удалить трекер?", message: nil, preferredStyle: .actionSheet)
+        
+        let deleteAction = UIAlertAction(title: "Удалить", style: .destructive) { _ in
+            self.deleteTracker(at: indexPath)
+        }
+        alertController.addAction(deleteAction)
+        
+        let cancelAction = UIAlertAction(title: "Отменить", style: .cancel)
+        alertController.addAction(cancelAction)
+        
+        present(alertController, animated: true)
+    }
+    
+    private func deleteTracker(at indexPath: IndexPath) {
+        let trackerCoreData = dataProvider.getTrackerCoreData(indexPath: indexPath)
+        do {
+            try dataProvider.deleteTracker(trackerCoreData: trackerCoreData)
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 }
 

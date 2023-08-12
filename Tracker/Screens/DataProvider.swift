@@ -24,6 +24,7 @@ protocol DataProviderProtocol: AnyObject {
     
     func fetchTracker(id: String) -> TrackerCoreData?
     func addTracker(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws
+    func deleteTracker(trackerCoreData: TrackerCoreData) throws
     func getTrackerCoreData(indexPath: IndexPath) -> TrackerCoreData
     func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
     func getTrackerObject(indexPath: IndexPath) -> Tracker?
@@ -122,6 +123,14 @@ extension DataProvider: DataProviderProtocol {
             try trackerStore.addTracker(tracker: tracker, trackerCategoryCoreData: trackerCategoryCoreData)
         } catch {
             fatalError("Failed to addTracker: \(error)")
+        }
+    }
+    
+    func deleteTracker(trackerCoreData: TrackerCoreData) throws {
+        do {
+            try trackerStore.deleteTracker(trackerCoreData: trackerCoreData)
+        } catch {
+            fatalError("Failed to deleteTracker: \(error)")
         }
     }
     
