@@ -234,7 +234,7 @@ extension CreateTrackerViewController: UITableViewDataSource {
         }
         let cellName = trackerOptions[indexPath.row]
         let cellAdditionalUIElement = CellElement.arrowImageView
-        cell.configCell(nameLabel: cellName, element: cellAdditionalUIElement, indexPath: indexPath, isSelected: nil)
+        cell.configCell(nameLabel: cellName, element: cellAdditionalUIElement, indexPath: indexPath, isSelected: false)
         
         switch indexPath.row {
         case 0:
@@ -263,7 +263,7 @@ extension CreateTrackerViewController: UITableViewDelegate {
         if indexPath.row == 0 {
             let model = CategoriesModel()
             let viewModel = CategoriesListViewModel(model: model)
-            let vc = CategoriesListViewController(viewModel: viewModel)
+            let vc = CategoriesListViewController(viewModel: viewModel, chosenCategory: categoryValue)
             self.delegate = vc
             vc.bind()
             vc.delegate = self

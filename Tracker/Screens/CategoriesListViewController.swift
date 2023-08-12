@@ -44,8 +44,9 @@ final class CategoriesListViewController: UIViewController {
         return tableView
     }()
     
-    init(viewModel: CategoriesListViewModel) {
+    init(viewModel: CategoriesListViewModel, chosenCategory: String?) {
         self.viewModel = viewModel
+        self.chosenCategoryName = chosenCategory
         viewModel.loadCategoriesList()
         super.init(nibName: nil, bundle: nil)
     }
@@ -122,6 +123,7 @@ final class CategoriesListViewController: UIViewController {
         func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reuseIdentifier) as? CategoryCell else { return UITableViewCell() }
             let cellName = viewModel.categories[indexPath.row].name
+            print(chosenCategoryName)
             cell.configCell(nameLabel: cellName, isSelected: cellName == chosenCategoryName)
             cell.selectionStyle = .none
             return cell

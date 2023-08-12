@@ -57,7 +57,7 @@ final class TrackerOptionsCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configCell(nameLabel: String, element: CellElement, indexPath: IndexPath, isSelected: Bool?) {
+    func configCell(nameLabel: String, element: CellElement, indexPath: IndexPath, isSelected: Bool) {
         // В зависимости от входного элемента настраиваем нужный UI элемент для экрана.
         switch element {
         case .arrowImageView:
@@ -75,9 +75,10 @@ final class TrackerOptionsCell: UITableViewCell {
         case .daySelectionSwitch:
             daySelectionSwitch = UISwitch()
             guard let daySelectionSwitch = daySelectionSwitch else { return }
-            if isSelected != nil {
+            if isSelected {
                 daySelectionSwitch.isOn = true
             }
+
             daySelectionSwitch.addTarget(self, action: #selector(switchValueDidChanged), for: .touchUpInside)
             contentView.addViewsWithNoTAMIC(daySelectionSwitch)
             

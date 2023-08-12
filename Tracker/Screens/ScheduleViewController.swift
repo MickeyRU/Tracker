@@ -109,8 +109,8 @@ extension ScheduleViewController: UITableViewDataSource {
         let day = weekDays[adjustedIndex]
         let cellAdditionalUIElement = CellElement.daySelectionSwitch
         // Проверяем, содержится ли текущий день в массиве weekSchedule
-           let isSelected = weekSchedule.contains(day)
-        cell.configCell(nameLabel: day.dayName, element: cellAdditionalUIElement, indexPath: indexPath, isSelected:isSelected )
+        let isSelected = weekSchedule.contains(day)
+        cell.configCell(nameLabel: day.dayName, element: cellAdditionalUIElement, indexPath: indexPath, isSelected: isSelected)
         return cell
     }
 }
@@ -129,14 +129,13 @@ extension ScheduleViewController: UITableViewDelegate {
 
 extension ScheduleViewController: SwitcherProtocolDelegate {
     func receiveSwitcherValue(isSelected: Bool, indexPath: IndexPath) {
-        weekSchedule.removeAll()
         let adjustedIndex = (indexPath.row + 1) % weekDays.count // Применяем сдвиг индекса
         
-        let weekElement = weekDays[adjustedIndex]
-        if isSelected {
-            weekSchedule.append(weekElement)
+        let day = weekDays[adjustedIndex]
+        if isSelected, !weekSchedule.contains(day) {
+            weekSchedule.append(day)
         } else {
-            if let index = weekSchedule.firstIndex(of: weekElement) {
+            if let index = weekSchedule.firstIndex(of: day) {
                 weekSchedule.remove(at: index)
             }
         }
