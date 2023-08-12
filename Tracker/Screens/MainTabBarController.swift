@@ -10,6 +10,7 @@ import UIKit
 final class MainTabBarController: UITabBarController {
     private let trackersViewController = TrackersViewController()
     private let statisticsViewController = StatisticsViewController()
+    private let borderView = UIView()
     
     private var trackerNavigationController: UINavigationController!
     
@@ -19,6 +20,7 @@ final class MainTabBarController: UITabBarController {
         trackerNavigationController = UINavigationController(rootViewController: trackersViewController)
         viewControllers = [trackerNavigationController, statisticsViewController]
         setupTabBarItems()
+        borderConfigure()
     }
     
     private func setupTabBarItems() {
@@ -28,5 +30,16 @@ final class MainTabBarController: UITabBarController {
         statisticsViewController.tabBarItem = UITabBarItem(title: "Статистика",
                                                            image: Images.statisticsTabBarImage,
                                                            selectedImage: nil)
+    }
+    
+    private func borderConfigure() {
+        tabBar.addViewsWithNoTAMIC(borderView)
+        borderView.backgroundColor = .gray
+        
+        NSLayoutConstraint.activate([
+            borderView.bottomAnchor.constraint(equalTo: tabBar.topAnchor),
+            borderView.widthAnchor.constraint(equalTo: tabBar.widthAnchor),
+            borderView.heightAnchor.constraint(equalToConstant: 1)
+        ])
     }
 }

@@ -54,6 +54,7 @@
 		BEEE7C522A40C98400315F2D /* UIColor + Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEE7C512A40C98400315F2D /* UIColor + Extensions.swift */; };
 		BEEE7C592A41BB4A00315F2D /* ScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEE7C582A41BB4A00315F2D /* ScheduleViewController.swift */; };
 		BEEE7C5D2A41CA0200315F2D /* SeparatorLineHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEE7C5C2A41CA0200315F2D /* SeparatorLineHelper.swift */; };
+		BEF526502A87EF4800EE9068 /* FilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEF5264F2A87EF4800EE9068 /* FilterViewController.swift */; };
 		BEFF60FF2A87BAC70094DC5E /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = BEFF60FE2A87BAC70094DC5E /* SnapshotTesting */; };
 /* End PBXBuildFile section */
 
@@ -120,6 +121,7 @@
 		BEEE7C512A40C98400315F2D /* UIColor + Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor + Extensions.swift"; sourceTree = "<group>"; };
 		BEEE7C582A41BB4A00315F2D /* ScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewController.swift; sourceTree = "<group>"; };
 		BEEE7C5C2A41CA0200315F2D /* SeparatorLineHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeparatorLineHelper.swift; sourceTree = "<group>"; };
+		BEF5264F2A87EF4800EE9068 /* FilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,7 +150,6 @@
 				6C2B359BA814AAFF5479E489 /* Pods-Tracker.debug.xcconfig */,
 				1E3A6CBEB0D31ADD3846EA2B /* Pods-Tracker.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -403,6 +404,7 @@
 				BE1E62C32A3F8EBE002185B2 /* ChooseTrackerTypeViewController.swift */,
 				BEEE7C4D2A40412700315F2D /* CreateTrackerViewController.swift */,
 				BEEE7C582A41BB4A00315F2D /* ScheduleViewController.swift */,
+				BEF5264F2A87EF4800EE9068 /* FilterViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -606,6 +608,7 @@
 				BE8AC63C2A7A6AA7007822BD /* Observable.swift in Sources */,
 				BE665AE72A601FAC00E3E3B9 /* TrackerRecordStore.swift in Sources */,
 				BEEE7C4E2A40412700315F2D /* CreateTrackerViewController.swift in Sources */,
+				BEF526502A87EF4800EE9068 /* FilterViewController.swift in Sources */,
 				BE638BC12A3C7D58005900C2 /* SceneDelegate.swift in Sources */,
 				BE20961F2A86608E0058409C /* TrackerUIHelper.swift in Sources */,
 				BE7A66972A77ADAC006BC7AA /* UserDefaultsBacked.swift in Sources */,

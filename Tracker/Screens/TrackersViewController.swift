@@ -37,6 +37,15 @@ final class TrackersViewController: UIViewController {
         return collectionView
     }()
     
+    private lazy var filterButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Фильтры", for: .normal)
+        button.backgroundColor = UIColor(hex: 0x3772E7)
+        button.layer.cornerRadius = 16
+        button.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
     private let placeholderView = PlaceholderView(
         title: "Что будем отслеживать?"
     )
@@ -109,7 +118,7 @@ final class TrackersViewController: UIViewController {
     }
     
     private func setupViews() {
-        [searchTextField, trackersCollectionView, placeholderView].forEach { view.addViewsWithNoTAMIC($0) }
+        [searchTextField, trackersCollectionView, placeholderView, filterButton].forEach { view.addViewsWithNoTAMIC($0) }
         
         NSLayoutConstraint.activate([
             searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -123,7 +132,12 @@ final class TrackersViewController: UIViewController {
             trackersCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
             placeholderView.centerXAnchor.constraint(equalTo: trackersCollectionView.centerXAnchor),
-            placeholderView.centerYAnchor.constraint(equalTo: trackersCollectionView.centerYAnchor)
+            placeholderView.centerYAnchor.constraint(equalTo: trackersCollectionView.centerYAnchor),
+            
+            filterButton.heightAnchor.constraint(equalToConstant: 50),
+            filterButton.widthAnchor.constraint(equalToConstant: 114),
+            filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
         ])
     }
     
@@ -147,6 +161,12 @@ final class TrackersViewController: UIViewController {
         let dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: date)
         guard let dayWithZeroedTime = Calendar.current.date(from: dateComponents) else { return Date() }
         return dayWithZeroedTime
+    }
+    
+    @objc
+    private func filterButtonTapped() {
+        let filterViewController = FilterViewController()
+        present(filterViewController, animated: true)
     }
     
     @objc
