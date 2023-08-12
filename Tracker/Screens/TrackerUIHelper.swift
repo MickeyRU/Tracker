@@ -9,7 +9,7 @@ import UIKit
 
 enum TrackerViewControllerMode {
     case create(String, [String])
-    case edit(Tracker, String, [String])
+    case edit(Tracker, String, Int, [String])
 }
 
 final class TrackerUIHelper {
@@ -22,8 +22,14 @@ final class TrackerUIHelper {
     
     func createPageTitle() -> UILabel {
         let label = UILabel()
-        label.text = ""
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .black
+        return label
+    }
+    
+    func createdayCountLabel() -> UILabel {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 32, weight: .bold)
         label.textColor = .black
         return label
     }

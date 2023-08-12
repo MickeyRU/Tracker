@@ -36,6 +36,11 @@ final class CreateTrackerViewController: UIViewController {
         return createUIHelper.createPageTitle()
     }()
     
+    private lazy var dayCountLabel: UILabel = {
+        let label = createUIHelper.createdayCountLabel()
+        return label
+    }()
+    
     private lazy var trackerNameTextField: UITextField = {
         let textField = createUIHelper.createTrackerNameTextField()
         textField.delegate = self
@@ -84,13 +89,14 @@ final class CreateTrackerViewController: UIViewController {
             configContent(title, options, isEdit: true)
             isEditingViewController = false
             
-        case .edit(let tracker, let categoryName, let options):
+        case .edit(let tracker, let categoryName, let completedDays, let options):
             configContent("Редактирование привычки", options, isEdit: false)
             trackerNameTextField.text = tracker.name
             trackerForEditing = tracker
             categoryValue = categoryName
             weekSchedule = tracker.schedule
             isEditingViewController = true
+            dayCountLabel.text = "\(completedDays) дня" // Локализировать склонения
         }
         
         view.backgroundColor = .white
@@ -127,7 +133,6 @@ final class CreateTrackerViewController: UIViewController {
             trackerNameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             trackerNameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             trackerNameTextField.heightAnchor.constraint(equalToConstant: 75),
-            trackerNameTextField.topAnchor.constraint(equalTo: pageTitle.bottomAnchor, constant: 38),
             
             trackerOptionsTableView.topAnchor.constraint(equalTo: trackerNameTextField.bottomAnchor, constant: 24),
             trackerOptionsTableView.leadingAnchor.constraint(equalTo: trackerNameTextField.leadingAnchor),
@@ -142,8 +147,25 @@ final class CreateTrackerViewController: UIViewController {
             buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             buttonStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             buttonStackView.topAnchor.constraint(equalTo: emojiAndColorsCollectionView.bottomAnchor, constant: 16),
-            buttonStackView.heightAnchor.constraint(equalToConstant: 60)
+            buttonStackView.heightAnchor.constraint(equalToConstant: 60),
+            buttonStackView.bottomAnchor.constraint(equalTo: screenScrollView.bottomAnchor)
         ])
+        
+        if isEditingViewController {
+            screenScrollView.addViewsWithNoTAMIC(dayCountLabel)
+            
+            NSLayoutConstraint.activate([
+                dayCountLabel.centerXAnchor.constraint(equalTo: screenScrollView.centerXAnchor),
+                dayCountLabel.topAnchor.constraint(equalTo: pageTitle.bottomAnchor, constant: 38),
+                
+                trackerNameTextField.topAnchor.constraint(equalTo: dayCountLabel.bottomAnchor, constant: 40),
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                trackerNameTextField.topAnchor.constraint(equalTo: pageTitle.bottomAnchor, constant: 38)
+            ])
+
+        }
     }
     
     private func setupTableView() {

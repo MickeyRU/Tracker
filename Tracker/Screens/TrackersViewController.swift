@@ -334,7 +334,8 @@ extension TrackersViewController: UICollectionViewDelegate {
     
     private func editItem(tracker: Tracker, categoryName: String) {
         let optionsArray = ["Категория", "Расписание"]
-        let editViewController = CreateTrackerViewController(mode: .edit(tracker, categoryName, optionsArray))
+        let completedDays = dataProvider.countRecordForTracker(trackerID: tracker.id.uuidString)
+        let editViewController = CreateTrackerViewController(mode: .edit(tracker, categoryName, completedDays, optionsArray))
         editViewController.modalPresentationStyle = .formSheet
         present(editViewController, animated: true)
     }
