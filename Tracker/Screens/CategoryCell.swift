@@ -31,16 +31,15 @@ final class CategoryCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configCell(nameLabel: String, isSelected: Bool?) {
+    func configCell(nameLabel: String, isSelected: Bool) {
         self.cellNameLabel.text = nameLabel
-        guard let isSelected = isSelected else { return }
-        categorySelection(isSeleted: isSelected)
+        categorySelection(isSelected: isSelected)
     }
     
-    func categorySelection(isSeleted: Bool) {
+    func categorySelection(isSelected: Bool) {
         selectedImage.image = isSelected ? Images.selectedImage : nil
     }
-    
+
     private func setupViews() {
         [cellNameLabel, selectedImage].forEach { contentView.addViewsWithNoTAMIC($0) }
         
