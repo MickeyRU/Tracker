@@ -39,10 +39,11 @@ final class MainTabBarController: UITabBarController {
     }
     
     private func setupTabBarItems() {
-        trackersViewController.tabBarItem = UITabBarItem(title: "Трекер",
+        trackersViewController.tabBarItem = UITabBarItem(title: NSLocalizedString("trackers", comment:
+                                                                                 "Tracker page on tabBar"),
                                                          image: Images.trackerTabBarImage,
                                                          selectedImage: nil)
-        statisticsViewController.tabBarItem = UITabBarItem(title: "Статистика",
+        statisticsViewController.tabBarItem = UITabBarItem(title: NSLocalizedString("statistics", comment: "Statistics page on tabBar"),
                                                            image: Images.statisticsTabBarImage,
                                                            selectedImage: nil)
     }

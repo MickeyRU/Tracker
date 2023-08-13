@@ -40,7 +40,7 @@ final class TrackersViewController: UIViewController {
     
     private lazy var filterButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Фильтры", for: .normal)
+        button.setTitle(NSLocalizedString("filters", comment: "Filter button"), for: .normal)
         button.backgroundColor = UIColor(hex: 0x3772E7)
         button.layer.cornerRadius = 16
         button.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
@@ -109,7 +109,7 @@ final class TrackersViewController: UIViewController {
     private func setupNavigationBar() {
         // Установка заголовка
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.title = "Трекеры"
+        navigationItem.title = NSLocalizedString("trackers", comment: "Main Screen title")
         
         // Создание UIBarButtonItem с кнопкой "+"
         let addButton = UIBarButtonItem(image: Images.addTrackerButtonImage, style: .plain, target: self, action: #selector(addButtonTapped))

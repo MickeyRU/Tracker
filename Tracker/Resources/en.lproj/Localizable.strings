@@ -1,0 +1,8 @@
+// MARK: - Filters
+"filters" = "Filters";
+
+// MARK: - TabBar
+// Trackers tab bar and TrackersViewController.trackerLabeltext
+"trackers" = "Trackers";
+// Trackers tab bar and statistics
+"statistics" = "Statistics";

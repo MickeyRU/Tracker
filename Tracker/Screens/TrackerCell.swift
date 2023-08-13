@@ -128,19 +128,9 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func formatDayLabel(daysCount: Int) -> String {
-        let suffix: String
+        let formatString : String = NSLocalizedString("number of days", comment: "Days count string format to be found in Localized.stringsdict")
         
-        if daysCount % 10 == 1 && daysCount % 100 != 11 {
-            suffix = "день"
-        } else if (daysCount % 10 == 2 && daysCount % 100 != 12) ||
-                    (daysCount % 10 == 3 && daysCount % 100 != 13) ||
-                    (daysCount % 10 == 4 && daysCount % 100 != 14) {
-            suffix = "дня"
-        } else {
-            suffix = "дней"
-        }
-        
-        return "\(daysCount) \(suffix)"
+       return String.localizedStringWithFormat(formatString, daysCount)
     }
     
     @objc
