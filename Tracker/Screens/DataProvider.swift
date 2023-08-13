@@ -30,12 +30,12 @@ protocol DataProviderProtocol: AnyObject {
     func getTrackerObject(indexPath: IndexPath) -> Tracker?
     func getTrackerCategoryName(indexPath: IndexPath) -> String 
     func togglePinForTracker(indexPath: IndexPath) throws
-    
+    func updateTracker(trackerCoreData: TrackerCoreData, trackerCategoryCoreData: TrackerCategoryCoreData) throws
+
     func addNewTrackerRecord(trackerRecord: TrackerRecord, trackerCoreData: TrackerCoreData) throws
     func deleteRecord(date: Date, trackerID: String) throws
     func countRecordForTracker(trackerID: String) -> Int
     func trackerTrackedToday(date: Date, trackerID: String) -> Bool
-    func updateTracker(trackerCoreData: TrackerCoreData, trackerCategoryCoreData: TrackerCategoryCoreData) throws
     
     func addFiltersForFetchResultController(searchText: String, date: Date) throws
     

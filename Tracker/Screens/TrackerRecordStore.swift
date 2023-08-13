@@ -19,6 +19,7 @@ protocol TrackerRecordStoreProtocol: AnyObject {
     
     func countRecordForTracker(trackerID: String) -> Int
     func trackerTrackedToday(date: Date, trackerID: String) -> Bool
+    func getCompletedTrackers() -> [TrackerRecord]
 }
 
 final class TrackerRecordStore: NSObject {
@@ -78,5 +79,27 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
         )
         guard let recordsForTacker = try? context.fetch(request) else { return false }
         return !recordsForTacker.isEmpty
-   }
+    }
+    
+    func getCompletedTrackers() -> [TrackerRecord] {
+        let request = TrackerRecordCoreData.fetchRequest()
+        
+        do {
+            let trackerRecordsCoreData = try context.fetch(request)
+            
+            let trackerRecords = trackerRecordsCoreData.map { coreDataRecord -> TrackerRecord in
+                guard
+                    let id = coreDataRecord.trackerID,
+                    let uuid = UUID(uuidString: id),
+                    let date = coreDataRecord.date
+                else { return TrackerRecord(trackerID: UUID(), date: Date()) }
+                return TrackerRecord(trackerID: uuid, date: date)
+            }
+            
+            return trackerRecords
+        } catch {
+            print("Ошибка при извлечении записей TrackerRecord: \(error)")
+            return []
+        }
+    }
 }

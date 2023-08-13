@@ -8,6 +8,16 @@
 import UIKit
 
 extension UIColor {
+    static let gradientColors = [UIColor(hex: 0x007BFA),
+                                 UIColor(hex: 0x46E69D),
+                                 UIColor(hex: 0xFD4C49)]
+    
+    static var randomColor: UIColor {
+        let red = CGFloat.random(in: 0...1)
+        let green = CGFloat.random(in: 0...1)
+        let blue = CGFloat.random(in: 0...1)
+        return UIColor(red: red, green: green, blue: blue, alpha: 1)
+    }
     
     convenience init(hex: Int, alpha: CGFloat = 1.0) {
         self.init(
@@ -18,12 +28,6 @@ extension UIColor {
         )
     }
     
-    static var randomColor: UIColor {
-        let red = CGFloat.random(in: 0...1)
-        let green = CGFloat.random(in: 0...1)
-        let blue = CGFloat.random(in: 0...1)
-        return UIColor(red: red, green: green, blue: blue, alpha: 1)
-    }
     
     static func hexString(from color: UIColor) -> String {
         let components = color.cgColor.components

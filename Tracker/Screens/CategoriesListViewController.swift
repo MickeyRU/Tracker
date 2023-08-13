@@ -47,7 +47,6 @@ final class CategoriesListViewController: UIViewController {
     init(viewModel: CategoriesListViewModel, chosenCategory: String?) {
         self.viewModel = viewModel
         self.chosenCategoryName = chosenCategory
-        viewModel.loadCategoriesList()
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -62,6 +61,11 @@ final class CategoriesListViewController: UIViewController {
         setupViews()
         setupTableView()
         checkCategoryList()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.loadCategoriesList()
     }
     
     @objc
