@@ -18,11 +18,34 @@ final class CreateTrackerViewController: UIViewController {
     private let mode: TrackerViewControllerMode
     
     private var trackerOptions: [String] = [] // Опции для отображение в UI, доступные пользователю для выбранного типа трекера (Например расписание или категория)
-    private var weekSchedule: [WeekDay] = []
+    private var weekSchedule: [WeekDay] = [] {
+        didSet {
+            checkStatusForDoneButton()
+        }
+    }
     private var trackerForEditing: Tracker?
-    private var selectedEmoji: [Int: String] = [:]
-    private var selectedColor: [Int: UIColor] = [:]
-    private var categoryValue: String?
+    private var selectedEmoji: [Int: String] = [:] {
+        didSet {
+            checkStatusForDoneButton()
+        }
+    }
+    private var selectedColor: [Int: UIColor] = [:] {
+        didSet {
+            checkStatusForDoneButton()
+        }
+    }
+    private var categoryValue: String? {
+        didSet {
+            checkStatusForDoneButton()
+        }
+    }
+    
+    private var nameTrackerText: String? {
+        didSet {
+            checkStatusForDoneButton()
+        }
+    }
+    
     private var isEditingViewController = false
     
     private var colorsArray: [UIColor] = []
@@ -92,11 +115,14 @@ final class CreateTrackerViewController: UIViewController {
         case .edit(let tracker, let categoryName, let completedDays, let options):
             configContent("Редактирование привычки", options, isEdit: false)
             trackerNameTextField.text = tracker.name
+            nameTrackerText = tracker.name
             trackerForEditing = tracker
             categoryValue = categoryName
             weekSchedule = tracker.schedule
             isEditingViewController = true
-            dayCountLabel.text = "\(completedDays) дня" // Локализировать склонения
+            
+            let formatString : String = NSLocalizedString("number of days", comment: "Days count string format to be found in Localized.stringsdict")
+            dayCountLabel.text = String.localizedStringWithFormat(formatString, completedDays)
         }
         
         view.backgroundColor = .white
@@ -105,10 +131,10 @@ final class CreateTrackerViewController: UIViewController {
         setupCollectionView()
         setupButtonStackView()
     }
-
+    
     private func configContent(_ title: String, _ options: [String], isEdit: Bool) {
-        self.pageTitle.text = title
         self.trackerOptions = options
+        self.pageTitle.text = title
         self.createButton.addTarget(self, action: #selector(doneButtonTapped), for: .touchUpInside)
         if isEdit {
             self.createButton.setTitle("Создать", for: .normal)
@@ -164,7 +190,7 @@ final class CreateTrackerViewController: UIViewController {
             NSLayoutConstraint.activate([
                 trackerNameTextField.topAnchor.constraint(equalTo: pageTitle.bottomAnchor, constant: 38)
             ])
-
+            
         }
     }
     
@@ -190,6 +216,39 @@ final class CreateTrackerViewController: UIViewController {
         buttonStackView.spacing = 8
         buttonStackView.axis = .horizontal
         buttonStackView.distribution = .fillEqually
+    }
+    
+    private func isDoneButtonActive() -> Bool {
+        let isNameValid = (nameTrackerText?.count ?? 0) > 0
+        let isEmojiSet = !selectedEmoji.isEmpty
+        let isColorSet = !selectedColor.isEmpty
+           
+        var isWeekScheduleSet = true
+        if trackerOptions.contains("Расписание") {
+            isWeekScheduleSet = !weekSchedule.isEmpty
+        } else {            
+        }
+           
+        var isCategorySet = true
+        if trackerOptions.contains("Категория") {
+               isCategorySet = categoryValue != nil
+        }
+           
+        if isNameValid && isWeekScheduleSet && isEmojiSet && isColorSet && isCategorySet {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    private func checkStatusForDoneButton() {
+        if isDoneButtonActive() {
+            createButton.isEnabled = true
+            createButton.backgroundColor = .black
+        } else {
+            createButton.isEnabled = false
+            createButton.backgroundColor = .gray
+        }
     }
     
     @objc
@@ -307,6 +366,17 @@ extension CreateTrackerViewController: UITableViewDelegate {
 extension CreateTrackerViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        if let currentText = textField.text {
+            nameTrackerText = currentText
+        }
+        return true
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if let currentText = textField.text {
+            let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
+            nameTrackerText = newText
+        }
         return true
     }
 }

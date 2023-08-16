@@ -70,7 +70,8 @@ final class TrackerUIHelper {
         let button = UIButton()
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 16
-        button.backgroundColor = .black
+        button.backgroundColor = .gray
+        button.isEnabled = false
         return button
     }
     

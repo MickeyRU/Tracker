@@ -17,9 +17,8 @@ final class CategoriesListViewController: UIViewController {
     private var viewModel: CategoriesListViewModel
     private var chosenCategoryName: String?
     
-    private let placeholderView = PlaceholderView(
-        title: "Привычки и события можно объединить по смыслу?"
-    )
+    private let placeholderView = PlaceholderView(title: "Привычки и события можно объединить по смыслу?",
+                                                  image: Images.emptyOnScreenImage ?? UIImage())
     
     private let pageTitleLabel: UILabel = {
         let label = UILabel()

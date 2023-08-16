@@ -13,6 +13,8 @@ final class FilterViewController: UIViewController {
     
     private lazy var filtersTableView: UITableView = {
         let tableView = UITableView()
+        tableView.isScrollEnabled = false
+        tableView.layer.cornerRadius = 16
         return tableView
     }()
 
@@ -40,10 +42,7 @@ final class FilterViewController: UIViewController {
     private func configureTableView() {
         filtersTableView.dataSource = self
         filtersTableView.delegate = self
-        filtersTableView.isScrollEnabled = false
-        
         filtersTableView.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.reuseIdentifier)
-        filtersTableView.layer.cornerRadius = 16
     }
 }
 
@@ -54,7 +53,7 @@ extension FilterViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reuseIdentifier, for: indexPath) as?
-        CategoryCell else { fatalError("Invalid cell configuration") }
+        CategoryCell else { return UITableViewCell() }
         
         cell.configCell(nameLabel: filters[indexPath.row], isSelected: true)
         return cell

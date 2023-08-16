@@ -8,8 +8,10 @@
 import UIKit
 
 final class StatisticsViewController: UIViewController {
-    
     private let viewModel: StatisticsViewModel
+    
+    private let placeHolderView = PlaceholderView(title: "Анализировать пока нечего",
+                                                  image: Images.emptyScreenSmileImage ?? UIImage())
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -45,6 +47,7 @@ final class StatisticsViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         viewModel.getCompletedTrackersCount()
+        checkPlaceHolderStatus()
     }
     
     private func bind() {
@@ -55,7 +58,7 @@ final class StatisticsViewController: UIViewController {
     }
     
     private func setupViews() {
-        [titleLabel, statisticCollectionView].forEach { view.addViewsWithNoTAMIC($0) }
+        [titleLabel, statisticCollectionView, placeHolderView].forEach { view.addViewsWithNoTAMIC($0) }
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 44),
@@ -65,7 +68,10 @@ final class StatisticsViewController: UIViewController {
             statisticCollectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 77),
             statisticCollectionView.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             statisticCollectionView.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
-            statisticCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -126)
+            statisticCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -126),
+            
+            placeHolderView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            placeHolderView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
     
@@ -73,6 +79,16 @@ final class StatisticsViewController: UIViewController {
         statisticCollectionView.register(StatisticsCell.self, forCellWithReuseIdentifier: StatisticsCell.reusableIdentifier)
         statisticCollectionView.dataSource = self
         statisticCollectionView.delegate = self
+    }
+    
+    private func checkPlaceHolderStatus() {
+        if viewModel.trackersCompletedTotaly.count > 0 {
+            placeHolderView.isHidden = true
+            statisticCollectionView.isHidden = false
+        } else {
+            placeHolderView.isHidden = false
+            statisticCollectionView.isHidden = true
+        }
     }
 }
 

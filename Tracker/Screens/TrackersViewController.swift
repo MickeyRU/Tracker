@@ -47,9 +47,8 @@ final class TrackersViewController: UIViewController {
         return button
     }()
     
-    private let placeholderView = PlaceholderView(
-        title: "Что будем отслеживать?"
-    )
+    private let placeholderView = PlaceholderView(title: "Что будем отслеживать?",
+                                                  image: Images.emptyOnScreenImage ?? UIImage())
     
     init() {
         dataProvider = DataProvider(trackerStore: TrackerStore(),
@@ -142,8 +141,8 @@ final class TrackersViewController: UIViewController {
             trackersCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             trackersCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
-            placeholderView.centerXAnchor.constraint(equalTo: trackersCollectionView.centerXAnchor),
-            placeholderView.centerYAnchor.constraint(equalTo: trackersCollectionView.centerYAnchor),
+            placeholderView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            placeholderView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             
             filterButton.heightAnchor.constraint(equalToConstant: 50),
             filterButton.widthAnchor.constraint(equalToConstant: 114),
@@ -480,8 +479,14 @@ extension TrackersViewController: TrackerCellDelegate {
 extension TrackersViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        updateDate()
         reloadData(searchText: searchTextField.text)
+        return true
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let currentText = textField.text ?? ""
+        let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
+        reloadData(searchText: newText)
         return true
     }
 }
