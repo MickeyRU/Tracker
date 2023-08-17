@@ -15,9 +15,7 @@ final class MainTabBarController: UITabBarController {
     private let statisticsViewController: StatisticsViewController
     
     private let borderView = UIView()
-    
-    private var trackerNavigationController: UINavigationController!
-    
+        
     init() {
         self.statisticsModel = StatisticsModel()
         self.statisticsViewModel = StatisticsViewModel(model: self.statisticsModel)
@@ -32,8 +30,7 @@ final class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        trackerNavigationController = UINavigationController(rootViewController: trackersViewController)
-        viewControllers = [trackerNavigationController, statisticsViewController]
+        viewControllers = [trackersViewController, statisticsViewController]
         setupTabBarItems()
         borderConfigure()
     }

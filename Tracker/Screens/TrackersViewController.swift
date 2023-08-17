@@ -14,6 +14,32 @@ final class TrackersViewController: UIViewController {
     private var currentDate: Date
     // Параметры для настройки размеров коллекции
     private var params = GeometricParams(cellCount: 2, leftInset: 16, rightInset: 16, cellSpacing: 9)
+
+    private lazy var addButton: UIButton = {
+        let button = UIButton.systemButton(with: Images.addTrackerButtonImage ?? UIImage(), target: self, action: #selector(addButtonTapped))
+        button.tintColor = UIColor { (traits: UITraitCollection) -> UIColor in
+            if traits.userInterfaceStyle == .light {
+                return UIColor.black
+            } else {
+                return UIColor.white
+            }
+        }
+        return button
+    }()
+    
+    private lazy var pageTitle: UILabel = {
+        let label = UILabel()
+        label.textColor = UIColor { (traits: UITraitCollection) -> UIColor in
+            if traits.userInterfaceStyle == .light {
+                return UIColor.black
+            } else {
+                return UIColor.white
+            }
+        }
+        label.text = NSLocalizedString("trackers", comment: "Main Screen title")
+        label.font = .systemFont(ofSize: 32, weight: .bold)
+        return label
+    }()
     
     private lazy var datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
@@ -21,11 +47,20 @@ final class TrackersViewController: UIViewController {
         datePicker.datePickerMode = .date
         datePicker.locale = Locale(identifier: "ru_RU")
         datePicker.calendar.firstWeekday = 2
+        
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.day, .month, .year], from: Date())
+        
+        var dateComponents = DateComponents()
+        dateComponents.year = components.year
+        dateComponents.month = components.month
+        dateComponents.day = components.day
+        datePicker.date = calendar.date(from: dateComponents) ?? Date()
+        
         datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
         return datePicker
     }()
     
-    // ToDo: - Отображение кнопки "Очистить", которое есть в макетах не настроено. Доделать позже, сейчас просто стандартный крестик
     private lazy var searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
         textField.placeholder = "Поиск"
@@ -73,7 +108,6 @@ final class TrackersViewController: UIViewController {
         
         view.backgroundColor = ColorsHelper.shared.viewBackgroundColor
         
-        setupNavigationBar()
         setupCollectionView()
         setupViews()
         
@@ -105,33 +139,24 @@ final class TrackersViewController: UIViewController {
         reloadPlaceholder()
     }
     
-    private func setupNavigationBar() {
-        // Установка заголовка
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.title = NSLocalizedString("trackers", comment: "Main Screen title")
-        
-        // Создание UIBarButtonItem с кнопкой "+"
-        let addButton = UIBarButtonItem(image: Images.addTrackerButtonImage, style: .plain, target: self, action: #selector(addButtonTapped))
-        addButton.tintColor = UIColor { (traits: UITraitCollection) -> UIColor in
-            if traits.userInterfaceStyle == .light {
-                return UIColor.black
-            } else {
-                return UIColor.white
-            }
-        }
-        
-        navigationItem.leftBarButtonItem = addButton
-        
-        // Создание UIBarButtonItem с UIDatePicker в качестве кастомного представления
-        let datePickerBarButton = UIBarButtonItem(customView: datePicker)
-        navigationItem.rightBarButtonItem = datePickerBarButton
-    }
-    
     private func setupViews() {
-        [searchTextField, trackersCollectionView, placeholderView, filterButton].forEach { view.addViewsWithNoTAMIC($0) }
+        [addButton, datePicker, pageTitle, searchTextField, trackersCollectionView, placeholderView, filterButton].forEach { view.addViewsWithNoTAMIC($0) }
         
         NSLayoutConstraint.activate([
-            searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            addButton.heightAnchor.constraint(equalToConstant: 42),
+            addButton.widthAnchor.constraint(equalToConstant: 42),
+            addButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1),
+            addButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 6),
+            
+            pageTitle.topAnchor.constraint(equalTo: addButton.bottomAnchor, constant: 1),
+            pageTitle.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            
+            datePicker.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 11),
+            datePicker.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            datePicker.widthAnchor.constraint(equalToConstant: 100),
+            datePicker.heightAnchor.constraint(equalToConstant: 34),
+            
+            searchTextField.topAnchor.constraint(equalTo: pageTitle.bottomAnchor, constant: 7),
             searchTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             searchTextField.heightAnchor.constraint(equalToConstant: 36),
             searchTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
@@ -174,12 +199,22 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc
+    private func showDatePicker() {
+        let datePicker = UIDatePicker()
+        datePicker.preferredDatePickerStyle = .compact
+        datePicker.datePickerMode = .date
+        datePicker.locale = Locale(identifier: "ru_RU")
+        datePicker.calendar.firstWeekday = 2
+        datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
+    }
+    
+    @objc
     private func filterButtonTapped() {
         analyticsService.report(event: "click", params: [
             "screen": "Main",
             "item": "filter"
         ])
-
+        
         
         let filterViewController = FilterViewController()
         present(filterViewController, animated: true)
@@ -487,6 +522,11 @@ extension TrackersViewController: UITextFieldDelegate {
         let currentText = textField.text ?? ""
         let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
         reloadData(searchText: newText)
+        return true
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        reloadData(searchText: "")
         return true
     }
 }
