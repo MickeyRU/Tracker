@@ -15,6 +15,8 @@ protocol TrackerCellDelegate: AnyObject {
 final class TrackerCell: UICollectionViewCell {
     static let reuseIdentifier = "TrackerCell"
     
+    private let analyticsService = AnalyticsService.shared
+    
     private var trackerId: UUID?
     private var indexPath: IndexPath?
     weak var delegate: TrackerCellDelegate?
@@ -54,6 +56,12 @@ final class TrackerCell: UICollectionViewCell {
         return button
     }()
     
+    private var pinnedImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = Images.pinnedTrackerImage
+        return imageView
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -64,6 +72,8 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     func configCell(tracker: Tracker, isCompletedToday: Bool,  indexPath: IndexPath, completedDays: Int) {
+        layer.cornerRadius = 16
+        
         self.trackerId = tracker.id
         self.isCompletedToday = isCompletedToday
         self.indexPath = indexPath
@@ -72,6 +82,7 @@ final class TrackerCell: UICollectionViewCell {
         self.trackerTextLabel.text = tracker.name
         self.backGroundViewColor.backgroundColor = tracker.color
         self.trackButton.tintColor = tracker.color
+        self.pinnedImageView.isHidden = tracker.isPinned ? false : true
         updateDayCountLabelAndButton(completedDays: completedDays)
     }
     
@@ -85,7 +96,7 @@ final class TrackerCell: UICollectionViewCell {
     }
     
     private func setupViews() {
-        [backGroundViewColor, emojiLabel, trackerTextLabel, trackButton, completedDaysLabel].forEach { contentView.addViewsWithNoTAMIC($0) }
+        [backGroundViewColor, emojiLabel, trackerTextLabel, trackButton, completedDaysLabel, pinnedImageView].forEach { contentView.addViewsWithNoTAMIC($0) }
         
         NSLayoutConstraint.activate([
             backGroundViewColor.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -109,28 +120,26 @@ final class TrackerCell: UICollectionViewCell {
             
             completedDaysLabel.topAnchor.constraint(equalTo: backGroundViewColor.bottomAnchor, constant: 16),
             completedDaysLabel.leadingAnchor.constraint(equalTo: trackerTextLabel.leadingAnchor),
-            completedDaysLabel.trailingAnchor.constraint(equalTo: trackButton.leadingAnchor, constant: -8)
+            completedDaysLabel.trailingAnchor.constraint(equalTo: trackButton.leadingAnchor, constant: -8),
+            
+            pinnedImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            pinnedImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -4)
         ])
     }
     
     private func formatDayLabel(daysCount: Int) -> String {
-        let suffix: String
+        let formatString : String = NSLocalizedString("number of days", comment: "Days count string format to be found in Localized.stringsdict")
         
-        if daysCount % 10 == 1 && daysCount % 100 != 11 {
-            suffix = "день"
-        } else if (daysCount % 10 == 2 && daysCount % 100 != 12) ||
-                    (daysCount % 10 == 3 && daysCount % 100 != 13) ||
-                    (daysCount % 10 == 4 && daysCount % 100 != 14) {
-            suffix = "дня"
-        } else {
-            suffix = "дней"
-        }
-        
-        return "\(daysCount) \(suffix)"
+       return String.localizedStringWithFormat(formatString, daysCount)
     }
     
     @objc
     private func trackButtonTapped() {
+        analyticsService.report(event: "click", params: [
+            "screen": "Main",
+            "item": "track"
+        ])
+        
         guard
             let trackerId = trackerId,
             let indexPath = indexPath

@@ -22,7 +22,6 @@ final class OnBoardingViewController: UIViewController {
         return label
     }()
     
-    
     init(text: String, bgImage: UIImage) {
         self.textLabel.text = text
         self.bgImageView.image = bgImage

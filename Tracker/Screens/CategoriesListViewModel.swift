@@ -8,13 +8,6 @@
 import Foundation
 
 final class CategoriesListViewModel {
-    
-    ///   ViewModel (Модель представления)
-    ///   преобразует данные Model для отображения во View, то есть в пользовательском интерфейсе;
-    ///   оповещает View об изменении своего состояния;
-    ///   содержит функции, через вызовы которых View может изменять Model;
-    ///   НЕ управляет View и ничего не знает о пользовательском интерфейсе.
-    
     @Observable
     private(set)var categories: [Category] = []
     

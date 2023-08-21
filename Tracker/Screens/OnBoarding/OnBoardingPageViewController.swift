@@ -68,8 +68,8 @@ final class OnBoardingPageViewController: UIPageViewController {
     }
 }
 
-
 // MARK: - UIPageViewControllerDataSource
+
 extension OnBoardingPageViewController: UIPageViewControllerDataSource {
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         guard let viewControllerIndex = pages.firstIndex(of: viewController) else {
@@ -101,6 +101,7 @@ extension OnBoardingPageViewController: UIPageViewControllerDataSource {
 }
 
 // MARK: - UIPageViewControllerDelegate
+    
 extension OnBoardingPageViewController: UIPageViewControllerDelegate {
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         guard

@@ -18,7 +18,7 @@ final class LaunchViewController: UIViewController {
     private func checkOnBoardingStatus() {
         let mainTabBarController = MainTabBarController()
 
-        guard let _ = isOnboardingCompleted else {
+        guard isOnboardingCompleted != nil else {
             let onBoardingPageViewController = OnBoardingPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
             
             onBoardingPageViewController.confirmedByUser = { [weak self] in

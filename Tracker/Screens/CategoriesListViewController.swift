@@ -17,9 +17,8 @@ final class CategoriesListViewController: UIViewController {
     private var viewModel: CategoriesListViewModel
     private var chosenCategoryName: String?
     
-    private let placeholderView = PlaceholderView(
-        title: "Привычки и события можно объединить по смыслу?"
-    )
+    private let placeholderView = PlaceholderView(title: "Привычки и события можно объединить по смыслу?",
+                                                  image: Images.emptyOnScreenImage ?? UIImage())
     
     private let pageTitleLabel: UILabel = {
         let label = UILabel()
@@ -44,9 +43,9 @@ final class CategoriesListViewController: UIViewController {
         return tableView
     }()
     
-    init(viewModel: CategoriesListViewModel) {
+    init(viewModel: CategoriesListViewModel, chosenCategory: String?) {
         self.viewModel = viewModel
-        viewModel.loadCategoriesList()
+        self.chosenCategoryName = chosenCategory
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -63,13 +62,17 @@ final class CategoriesListViewController: UIViewController {
         checkCategoryList()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.loadCategoriesList()
+    }
+    
     @objc
     private func addCategoryButtonTapped() {
         let model = NewCategoryModel()
         let viewModel = NewCategoryViewModel(model: model)
         let destinationVC = NewCategoryViewController(viewModel: viewModel)
         destinationVC.delegate = self
-        destinationVC.bind()
         present(destinationVC, animated: true)
     }
     
@@ -110,11 +113,7 @@ final class CategoriesListViewController: UIViewController {
     }
     
     private func checkCategoryList() {
-        if viewModel.categories.count == 0 {
-            placeholderView.isHidden = false
-        } else {
-            placeholderView.isHidden = true
-        }
+        placeholderView.isHidden = viewModel.categories.count != 0
     }
 }
     
@@ -128,8 +127,8 @@ final class CategoriesListViewController: UIViewController {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryCell.reuseIdentifier) as? CategoryCell else { return UITableViewCell() }
             let cellName = viewModel.categories[indexPath.row].name
             var isSelected = false
-            if cellName == chosenCategoryName {
-                isSelected = true
+            if let chosenCategoryName = chosenCategoryName {
+                isSelected = cellName == chosenCategoryName
             }
             cell.configCell(nameLabel: cellName, isSelected: isSelected)
             cell.selectionStyle = .none
@@ -138,6 +137,7 @@ final class CategoriesListViewController: UIViewController {
     }
     
     // MARK: - UITableViewDelegate
+
     extension CategoriesListViewController: UITableViewDelegate {
         func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
             75

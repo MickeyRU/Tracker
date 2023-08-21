@@ -68,6 +68,7 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     func createCategory(category: TrackerCategory) throws -> TrackerCategoryCoreData {
         let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
         trackerCategoryCoreData.name = category.name
+        trackerCategoryCoreData.priority = 0
         try context.save()
         return trackerCategoryCoreData
     }

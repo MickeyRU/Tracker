@@ -10,7 +10,7 @@ import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-   private(set) lazy var persistentContainer: NSPersistentContainer = {
+    private(set) lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "TrackersCoreDataModel")
         container.loadPersistentStores { decription, error in
             if let error = error as NSError? {
@@ -21,11 +21,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        AnalyticsService.shared.activate()
         return true
     }
-
+    
     // MARK: UISceneSession Lifecycle
-
+    
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         let configuration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
         configuration.storyboard = nil

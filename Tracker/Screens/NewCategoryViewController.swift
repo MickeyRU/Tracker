@@ -52,6 +52,7 @@ final class NewCategoryViewController: UIViewController {
     init(viewModel: NewCategoryViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+        self.bind()
     }
     
     required init?(coder: NSCoder) {

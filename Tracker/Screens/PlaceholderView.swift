@@ -6,6 +6,7 @@
 //
 
 import UIKit
+
 final class PlaceholderView: UIView {
     private let emptyOnScreenLabel: UILabel = {
         let label = UILabel()
@@ -16,12 +17,12 @@ final class PlaceholderView: UIView {
     
     private let emptyOnScreenImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = Images.emptyOnScreenImage
         return imageView
     }()
     
-    init(title: String) {
+    init(title: String, image: UIImage) {
         self.emptyOnScreenLabel.text  = title
+        self.emptyOnScreenImage.image = image
         super.init(frame: .zero)
         
         addViewsWithNoTAMIC(emptyOnScreenLabel)

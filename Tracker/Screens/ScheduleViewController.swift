@@ -41,6 +41,15 @@ final class ScheduleViewController: UIViewController {
         return button
     }()
     
+    init(weekShedule: [WeekDay]) {
+        self.weekSchedule = weekShedule
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+        
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -71,7 +80,7 @@ final class ScheduleViewController: UIViewController {
     private func setupTableView() {
         daysOfWeekTableView.dataSource = self
         daysOfWeekTableView.delegate = self
-        daysOfWeekTableView.register(CreateTrackerCell.self, forCellReuseIdentifier: CreateTrackerCell.reuseIdentifier)
+        daysOfWeekTableView.register(TrackerOptionsCell.self, forCellReuseIdentifier: TrackerOptionsCell.reuseIdentifier)
         daysOfWeekTableView.layer.cornerRadius = 16
     }
     
@@ -90,16 +99,18 @@ extension ScheduleViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: CreateTrackerCell.reuseIdentifier, for: indexPath) as? CreateTrackerCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: TrackerOptionsCell.reuseIdentifier, for: indexPath) as? TrackerOptionsCell else {
             return UITableViewCell()
         }
         cell.delegate = self
         
         let adjustedIndex = (indexPath.row + 1) % weekDays.count // Вычисляем индекс с учетом сдвига
         
-        let cellName = weekDays[adjustedIndex]
+        let day = weekDays[adjustedIndex]
         let cellAdditionalUIElement = CellElement.daySelectionSwitch
-        cell.configCell(nameLabel: cellName.dayName, element: cellAdditionalUIElement, indexPath: indexPath)
+        // Проверяем, содержится ли текущий день в массиве weekSchedule
+        let isSelected = weekSchedule.contains(day)
+        cell.configCell(nameLabel: day.dayName, element: cellAdditionalUIElement, indexPath: indexPath, isSelected: isSelected)
         return cell
     }
 }
@@ -120,11 +131,11 @@ extension ScheduleViewController: SwitcherProtocolDelegate {
     func receiveSwitcherValue(isSelected: Bool, indexPath: IndexPath) {
         let adjustedIndex = (indexPath.row + 1) % weekDays.count // Применяем сдвиг индекса
         
-        let weekElement = weekDays[adjustedIndex]
-        if isSelected {
-            weekSchedule.append(weekElement)
+        let day = weekDays[adjustedIndex]
+        if isSelected, !weekSchedule.contains(day) {
+            weekSchedule.append(day)
         } else {
-            if let index = weekSchedule.firstIndex(of: weekElement) {
+            if let index = weekSchedule.firstIndex(of: day) {
                 weekSchedule.remove(at: index)
             }
         }

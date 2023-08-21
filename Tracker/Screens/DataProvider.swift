@@ -15,17 +15,23 @@ protocol DataProviderDelegate: AnyObject {
 protocol DataProviderProtocol: AnyObject {
     var numberOfSections: Int { get }
     var numberOfTrackers: Int { get }
-
+    
     func numberOfRowsInSection(section: Int) -> Int
     func nameOfSection(section: Int) -> String
     
     func fetchCategory(name: String) -> TrackerCategoryCoreData?
     func createCategory(category: TrackerCategory) throws -> TrackerCategoryCoreData
     
+    func fetchTracker(id: String) -> TrackerCoreData?
     func addTracker(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws
+    func deleteTracker(trackerCoreData: TrackerCoreData) throws
     func getTrackerCoreData(indexPath: IndexPath) -> TrackerCoreData
+    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
     func getTrackerObject(indexPath: IndexPath) -> Tracker?
-    
+    func getTrackerCategoryName(indexPath: IndexPath) -> String 
+    func togglePinForTracker(indexPath: IndexPath) throws
+    func updateTracker(trackerCoreData: TrackerCoreData, trackerCategoryCoreData: TrackerCategoryCoreData) throws
+
     func addNewTrackerRecord(trackerRecord: TrackerRecord, trackerCoreData: TrackerCoreData) throws
     func deleteRecord(date: Date, trackerID: String) throws
     func countRecordForTracker(trackerID: String) -> Int
@@ -46,7 +52,9 @@ final class DataProvider: NSObject {
     
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
         let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "category", ascending: false)]
+        
+        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \TrackerCoreData.category?.priority, ascending: false),
+                                        NSSortDescriptor(keyPath: \TrackerCoreData.category?.name, ascending: false)]
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
                                                                   managedObjectContext: context,
@@ -83,7 +91,7 @@ extension DataProvider: DataProviderProtocol {
     var numberOfTrackers: Int {
         fetchedResultsController.fetchedObjects?.count ?? 0
     }
-
+    
     
     func numberOfRowsInSection(section: Int) -> Int {
         fetchedResultsController.sections?[section].numberOfObjects ?? 0
@@ -97,6 +105,10 @@ extension DataProvider: DataProviderProtocol {
         trackerCategoryStore.fetchCategory(name: name)
     }
     
+    func fetchTracker(id: String) -> TrackerCoreData? {
+        trackerStore.fetchTracker(id: id)
+    }
+    
     func createCategory(category: TrackerCategory) throws -> TrackerCategoryCoreData {
         do {
             let newCategory = try trackerCategoryStore.createCategory(category: category)
@@ -108,20 +120,84 @@ extension DataProvider: DataProviderProtocol {
     
     func addTracker(tracker: Tracker, trackerCategoryCoreData: TrackerCategoryCoreData) throws {
         do {
-            try trackerStore.add(tracker: tracker, trackerCategoryCoreData: trackerCategoryCoreData)
+            try trackerStore.addTracker(tracker: tracker, trackerCategoryCoreData: trackerCategoryCoreData)
         } catch {
             fatalError("Failed to addTracker: \(error)")
         }
     }
     
+    func deleteTracker(trackerCoreData: TrackerCoreData) throws {
+        do {
+            try trackerStore.deleteTracker(trackerCoreData: trackerCoreData)
+        } catch {
+            fatalError("Failed to deleteTracker: \(error)")
+        }
+    }
+    
     func getTrackerObject(indexPath: IndexPath) -> Tracker? {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
-        guard let tracker = try? trackerStore.tracker(from: trackerCoreData) else { return nil }
+        guard let tracker = try? trackerStore.getTracker(from: trackerCoreData) else { return nil }
         return tracker
+    }
+    
+    func getTrackerCategoryName(indexPath: IndexPath) -> String {
+        let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        guard let categoryName = trackerCoreData.category?.name else { return "" }
+        return categoryName
+    }
+    
+    func updateTracker(trackerCoreData: TrackerCoreData, trackerCategoryCoreData: TrackerCategoryCoreData) throws {
+        do {
+            try trackerStore.updateTracker(trackerCoreData: trackerCoreData, trackerCategoryCoreData: trackerCategoryCoreData)
+        } catch {
+            fatalError("Failed to addTracker: \(error)")
+        }
     }
     
     func getTrackerCoreData(indexPath: IndexPath) -> TrackerCoreData {
         fetchedResultsController.object(at: indexPath)
+    }
+    
+    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
+        do {
+            let tracker = try trackerStore.getTracker(from: trackerCoreData)
+            return tracker
+        } catch {
+            fatalError("Failed to addTracker: \(error)")
+        }
+    }
+    
+    func togglePinForTracker(indexPath: IndexPath) {
+        let trackerCoreDataToToggle = getTrackerCoreData(indexPath: indexPath)
+        trackerCoreDataToToggle.isPinned.toggle()
+        
+        if trackerCoreDataToToggle.isPinned {
+            trackerCoreDataToToggle.previousCategory = trackerCoreDataToToggle.category?.name
+            if let existedCategoryCoreData = fetchCategory(name: "Закрепленные") {
+                trackerCoreDataToToggle.category = existedCategoryCoreData
+            } else {
+                let newPinnedCategory = TrackerCategory(name: "Закрепленные", trackers: [])
+                do {
+                    let newPinnedCategoryCoreData = try createCategory(category: newPinnedCategory)
+                    newPinnedCategoryCoreData.priority = 1
+                    trackerCoreDataToToggle.category = newPinnedCategoryCoreData
+                } catch {
+                    fatalError("Failed to togglePinForTracker: \(error)")
+                }
+            }
+        } else {
+            guard
+                let previousCategory = trackerCoreDataToToggle.previousCategory,
+                let previousCategoryCoreData = fetchCategory(name: previousCategory)
+            else { return }
+            trackerCoreDataToToggle.category = previousCategoryCoreData
+            trackerCoreDataToToggle.previousCategory = nil
+        }
+        do {
+            try context.save()
+        } catch {
+            fatalError("Failed to togglePinForTracker: \(error)")
+        }
     }
     
     func addNewTrackerRecord(trackerRecord: TrackerRecord, trackerCoreData: TrackerCoreData) throws {
@@ -150,7 +226,7 @@ extension DataProvider: DataProviderProtocol {
     
     func addFiltersForFetchResultController(searchText: String, date: Date) throws {
         let dayNumber = WeekDay.getWeekDayInNumber(for: date)
-
+        
         var predicates: [NSPredicate] = []
         let predicateForDate = NSPredicate(format: "%K CONTAINS[n] %@",
                                            #keyPath(TrackerCoreData.schedule), dayNumber)

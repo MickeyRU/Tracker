@@ -16,9 +16,9 @@ enum CellElement {
     case daySelectionSwitch
 }
 
-final class CreateTrackerCell: UITableViewCell {
-    static let reuseIdentifier = "CreateTrackerCell:"
-
+final class TrackerOptionsCell: UITableViewCell {
+    static let reuseIdentifier = "TrackerOptionsCell"
+    
     weak var delegate: SwitcherProtocolDelegate?
     
     private var isSwitchSelected = false
@@ -57,10 +57,7 @@ final class CreateTrackerCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configCell(nameLabel: String, element: CellElement, indexPath: IndexPath) {
-        self.cellNameLabel.text = nameLabel
-        self.indexPath = indexPath
-        
+    func configCell(nameLabel: String, element: CellElement, indexPath: IndexPath, isSelected: Bool) {
         // В зависимости от входного элемента настраиваем нужный UI элемент для экрана.
         switch element {
         case .arrowImageView:
@@ -77,19 +74,25 @@ final class CreateTrackerCell: UITableViewCell {
             }
         case .daySelectionSwitch:
             daySelectionSwitch = UISwitch()
-            daySelectionSwitch?.addTarget(self, action: #selector(switchValueDidChanged), for: .touchUpInside)
-            if let daySelectionSwitch = daySelectionSwitch {
-                contentView.addViewsWithNoTAMIC(daySelectionSwitch)
-                
-                NSLayoutConstraint.activate([
-                    daySelectionSwitch.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-                    daySelectionSwitch.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
-                ])
+            guard let daySelectionSwitch = daySelectionSwitch else { return }
+            if isSelected {
+                daySelectionSwitch.isOn = true
             }
+
+            daySelectionSwitch.addTarget(self, action: #selector(switchValueDidChanged), for: .touchUpInside)
+            contentView.addViewsWithNoTAMIC(daySelectionSwitch)
+            
+            NSLayoutConstraint.activate([
+                daySelectionSwitch.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+                daySelectionSwitch.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
+            ])
         }
+        
+        self.cellNameLabel.text = nameLabel
+        self.indexPath = indexPath
     }
     
-    func addValueToCellLabel(text: String) {
+    func addChoosenOptionTitle(text: String) {
         cellValueLabel.text = text
     }
     
